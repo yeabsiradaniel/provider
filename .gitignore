@@ -1,0 +1,89 @@
+##################################################
+# NODE.JS (Backend)
+##################################################
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+##################################################
+# REACT (Frontend Web)
+##################################################
+
+# Dependencies
+frontend/node_modules/
+
+# Build output
+frontend/build/
+frontend/dist/
+
+# Vite specific (if using Vite)
+frontend/.vite/
+
+##################################################
+# FLUTTER (Mobile App)
+##################################################
+
+# Dart / Flutter
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+# Build output
+build/
+**/build/
+
+# Generated iOS files
+ios/.symlinks/
+ios/Pods/
+
+# Android generated
+android/local.properties
+android/key.properties
+
+# Signing keys
+*.keystore
+*.jks
+
+##################################################
+# IDE / Editors
+##################################################
+
+.idea/
+*.iml
+.vscode/
+
+##################################################
+# OS FILES
+##################################################
+
+.DS_Store
+Thumbs.db
+
+##################################################
+# TEMP FILES
+##################################################
+
+*.tmp
+*.swp
+*.swo
