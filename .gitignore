@@ -23,6 +23,9 @@ yarn-error.log*
 pnpm-debug.log*
 *.log
 
+# Uploaded Files
+backend/uploads/
+
 ##################################################
 # REACT (Frontend Web)
 ##################################################

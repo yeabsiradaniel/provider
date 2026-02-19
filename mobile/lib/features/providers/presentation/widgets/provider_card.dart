@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/config.dart';
 
 class ProviderCard extends StatelessWidget {
   final String name;
@@ -28,6 +29,8 @@ class ProviderCard extends StatelessWidget {
     }
 
     final priceText = price != null ? '$price ETB/hr' : 'N/A';
+    
+    final fullImageUrl = imageUrl.startsWith('http') ? imageUrl : '$baseUrl$imageUrl';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -44,7 +47,7 @@ class ProviderCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: NetworkImage(imageUrl),
+                  image: NetworkImage(fullImageUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -101,7 +104,7 @@ class ProviderCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: status == 'VERIFIED'
+                color: status == 'ONLINE'
                     ? Colors.green.withOpacity(0.1)
                     : Colors.grey.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -109,7 +112,7 @@ class ProviderCard extends StatelessWidget {
               child: Text(
                 status,
                 style: TextStyle(
-                  color: status == 'VERIFIED' ? Colors.green : Colors.grey,
+                  color: status == 'ONLINE' ? Colors.green : Colors.grey,
                   fontWeight: FontWeight.bold,
                   fontSize: 10,
                 ),

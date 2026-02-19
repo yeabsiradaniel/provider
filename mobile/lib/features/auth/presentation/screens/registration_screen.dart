@@ -52,8 +52,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         'lastName': _lastNameController.text,
         'pin': _pinController.text,
         'role': _selectedRole == 0 ? 'client' : 'provider',
-        'profilePhoto': _profilePhoto?.path ?? '',
-        'idPhoto': _idPhoto?.path ?? '',
+        'profilePhoto': _profilePhoto,
+        'idPhoto': _idPhoto,
       };
 
       try {

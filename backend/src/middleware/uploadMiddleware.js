@@ -1,8 +1,12 @@
 const multer = require('multer');
 const path = require('path');
 
-// Set storage engine
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+    destination: './uploads/',
+    filename: function(req, file, cb){
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
 
 // Check file type
 function checkFileType(file, cb){
@@ -27,6 +31,6 @@ const upload = multer({
     fileFilter: function(req, file, cb){
         checkFileType(file, cb);
     }
-}).single('profilePhoto'); // 'profilePhoto' is the field name in the form-data
+}).fields([{ name: 'profilePhoto', maxCount: 1 }, { name: 'idPhoto', maxCount: 1 }]);
 
 module.exports = upload;

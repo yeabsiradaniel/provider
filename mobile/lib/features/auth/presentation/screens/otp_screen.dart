@@ -1,3 +1,4 @@
+
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,14 +8,13 @@ import 'package:mobile/features/auth/presentation/screens/registration_screen.da
 import 'package:mobile/features/client_dashboard/presentation/screens/client_home_screen.dart';
 import 'package:mobile/features/provider_dashboard/presentation/screens/category_selection_screen.dart';
 import 'package:mobile/features/provider_dashboard/presentation/screens/provider_dashboard_screen.dart';
-import 'package:mobile/features/provider_profile/domain/providers/provider_profile_provider.dart';
 import 'package:mobile/features/user/domain/providers/user_provider.dart';
 import 'package:mobile/features/language_selection/presentation/widgets/asymmetric_button.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   final String phoneNumber;
-  final Map<String, String> userData;
+  final Map<String, dynamic> userData;
 
   const OtpScreen({Key? key, required this.phoneNumber, required this.userData})
       : super(key: key);
@@ -35,33 +35,28 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         _isLoading = true;
       });
       try {
-        log('---- OTP SCREEN: Verifying OTP ----');
         final response = await _authService.verifyOtp(
             widget.phoneNumber, _otpController.text, widget.userData);
-        log('[OtpScreen] Raw response from authService: $response');
         
+        await _authService.saveAuthData(response);
         await ref.read(userProvider.notifier).fetchUser();
         
         final userRole = response['user']['role'];
         final isNewUser = response['isNewUser'] ?? false;
-        log('[OtpScreen] Extracted userRole: $userRole, isNewUser: $isNewUser');
 
         if (userRole == 'client') {
-          log('[OtpScreen] Navigating to ClientHomeScreen.');
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const ClientHomeScreen()),
             (Route<dynamic> route) => false,
           );
         } else if (userRole == 'provider') {
           if (isNewUser) {
-            log('[OtpScreen] New provider detected. Navigating to CategorySelectionScreen.');
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (context) => const CategorySelectionScreen()),
               (Route<dynamic> route) => false,
             );
           } else {
-            log('[OtpScreen] Existing provider detected. Navigating to ProviderDashboardScreen.');
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (context) => const ProviderDashboardScreen()),
@@ -69,7 +64,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             );
           }
         }
-        log('---------------------------------');
       } on AuthException catch (e) {
         final l10n = AppLocalizations.of(context)!;
         String displayMessage;

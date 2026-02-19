@@ -17,14 +17,25 @@ const requestOtp = async (req, res) => {
 };
 
 const verifyOtp = async (req, res) => {
-    const { phoneNumber, otp, firstName, lastName, pin, role, profilePhoto, idPhoto } = req.body;
+    const { phoneNumber, otp, firstName, lastName, pin, role } = req.body;
+    
+    // Extract file paths from multer
+    const profilePhotoPath = req.files.profilePhoto ? `/uploads/${req.files.profilePhoto[0].filename}` : null;
+    const idPhotoPath = req.files.idPhoto ? `/uploads/${req.files.idPhoto[0].filename}` : null;
 
     if (!phoneNumber || !otp) {
         return res.status(400).json({ message: 'Phone number and OTP are required.' });
     }
 
     try {
-        const userData = { firstName, lastName, pin, role, profilePhoto, idPhoto };
+        const userData = { 
+            firstName, 
+            lastName, 
+            pin, 
+            role, 
+            profilePhoto: profilePhotoPath, 
+            idPhoto: idPhotoPath 
+        };
         const { user, token, isNewUser } = await authService.verifyOtp(phoneNumber, otp, userData);
         res.status(200).json({ user, token, isNewUser });
     } catch (error) {

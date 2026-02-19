@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:mobile/core/config.dart';
 
 class ProfileAvatar extends StatelessWidget {
   final String imageUrl;
@@ -14,27 +14,20 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('ProfileAvatar: Building with imageUrl: "$imageUrl"');
-    final String _baseUrl = 'http://10.0.2.2:3001'; // Android emulator localhost
     ImageProvider backgroundImage;
 
-    // Check if it's a valid ObjectId (24 hex characters)
-    final isObjectId = imageUrl.length == 24 && RegExp(r'^[0-9a-fA-F]+$').hasMatch(imageUrl);
-
-    if (isObjectId) {
-      final fullUrl = '$_baseUrl/api/users/photo/$imageUrl';
-      log('ProfileAvatar: Detected GridFS ID. Constructing URL: $fullUrl');
+    if (imageUrl.startsWith('/uploads/')) {
+      // New flow: relative path from server
+      final fullUrl = '$baseUrl$imageUrl';
       backgroundImage = NetworkImage(fullUrl);
-    } else if (imageUrl.startsWith('http')) {
-      log('ProfileAvatar: Detected http URL.');
-      backgroundImage = NetworkImage(imageUrl);
-    } else if (imageUrl.isNotEmpty) {
-      log('ProfileAvatar: Detected local file path.');
+    } else if (imageUrl.startsWith('/data/')) {
+      // Old flow: absolute local file path
       backgroundImage = FileImage(File(imageUrl));
+    } else if (imageUrl.startsWith('http')) {
+      // Already a full URL
+      backgroundImage = NetworkImage(imageUrl);
     } else {
-      log('ProfileAvatar: ImageUrl is empty, using default.');
-      // I am not adding a default avatar asset as it does not exist.
-      // Instead, I'll use a placeholder icon.
+      // Placeholder
       return CircleAvatar(
         radius: radius,
         backgroundColor: Colors.grey.shade300,
@@ -46,7 +39,7 @@ class ProfileAvatar extends StatelessWidget {
       radius: radius,
       backgroundImage: backgroundImage,
       onBackgroundImageError: (exception, stackTrace) {
-        log('ProfileAvatar: Error loading image.', error: exception, stackTrace: stackTrace);
+        // Optionally log or handle image loading errors silently
       },
     );
   }

@@ -47,8 +47,7 @@ app.get('/api', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/provider', providerRoutes);
-app.use('/api/providers', providerRoutes); 
+app.use('/api/provider', providerRoutes); 
 app.use('/api/jobs', jobRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/features/categories/domain/models/category.dart';
+import 'package:mobile/core/config.dart';
 import 'package:mobile/features/location/domain/providers/location_provider.dart';
 import 'package:mobile/features/providers/domain/models/provider.dart' as prov_model;
 import 'package:mobile/features/providers/domain/services/provider_service.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/features/bookings/presentation/screens/confirm_booking_screen.dart';
-import 'dart:developer';
 
 class ProviderProfileScreen extends ConsumerStatefulWidget {
   final String providerId;
@@ -83,6 +83,13 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
     final l10n = AppLocalizations.of(context)!;
     final currentPosition = ref.watch(currentPositionProvider);
     final locale = Localizations.localeOf(context).languageCode;
+    
+    final profilePhotoUrl = _provider?.user.profilePhoto;
+    final fullImageUrl = (profilePhotoUrl != null && profilePhotoUrl.isNotEmpty)
+        ? (profilePhotoUrl.startsWith('http') ? profilePhotoUrl : '$baseUrl$profilePhotoUrl')
+        : 'https://via.placeholder.com/400';
+
+
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -93,8 +100,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                   pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
                     background: Image.network(
-                      _provider?.user.profilePhoto ??
-                          'https://via.placeholder.com/400',
+                      fullImageUrl,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -116,9 +122,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                           children: [
                             CircleAvatar(
                               radius: 40,
-                              backgroundImage: NetworkImage(
-                                  _provider?.user.profilePhoto ??
-                                      'https://via.placeholder.com/150'),
+                              backgroundImage: NetworkImage(fullImageUrl),
                             ),
                             const SizedBox(width: 16),
                             Column(
@@ -239,7 +243,6 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                     'lng': currentPosition.longitude
                   },
               };
-              log("Navigating to ConfirmBooking with details: $jobDetails");
               Navigator.push(
                 context,
                 MaterialPageRoute(

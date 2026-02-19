@@ -20,7 +20,7 @@ class ProviderService {
       if (userLocation != null) 'lat': userLocation.latitude.toString(),
       if (userLocation != null) 'lng': userLocation.longitude.toString(),
     };
-    final uri = Uri.parse('$_baseUrl/providers/search').replace(queryParameters: queryParameters);
+    final uri = Uri.parse('$_baseUrl/provider/search').replace(queryParameters: queryParameters);
     
     final response = await http.get(
       uri,

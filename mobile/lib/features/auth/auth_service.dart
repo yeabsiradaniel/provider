@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:convert';
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_state.dart';
@@ -20,21 +22,53 @@ class AuthService {
     }
   }
 
-  Future<User> verifyOtp(String phoneNumber, String otp) async {
+  Future<Map<String, dynamic>> verifyOtp(String phoneNumber, String otp, Map<String, dynamic> userData) async {
     final url = Uri.parse('$_backendUrl/auth/verify-otp');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'phoneNumber': phoneNumber, 'otp': otp}),
-    );
+    final request = http.MultipartRequest('POST', url);
+
+    // Add text fields
+    request.fields['phoneNumber'] = phoneNumber;
+    request.fields['otp'] = otp;
+    userData.forEach((key, value) {
+      if (value is String) {
+        request.fields[key] = value;
+      }
+    });
+
+    // Add profile photo file
+    if (userData['profilePhoto'] != null && userData['profilePhoto'] is File) {
+      File profilePhotoFile = userData['profilePhoto'];
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'profilePhoto',
+          profilePhotoFile.path,
+          contentType: MediaType('image', 'jpeg'), // Adjust content type as needed
+        ),
+      );
+    }
+    
+    // Add ID photo file
+    if (userData['idPhoto'] != null && userData['idPhoto'] is File) {
+      File idPhotoFile = userData['idPhoto'];
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'idPhoto',
+          idPhotoFile.path,
+          contentType: MediaType('image', 'jpeg'), // Adjust content type as needed
+        ),
+      );
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      final user = User.fromJson(data['user']);
-      await _saveToken(data['token']);
-      await _saveUserToPrefs(user);
-      return user;
+      // We are not saving the user here anymore, the OtpScreen will handle it
+      // based on the response.
+      return data;
     } else {
+      // Handle error response
       throw Exception('Failed to verify OTP: ${response.body}');
     }
   }
@@ -63,5 +97,11 @@ class AuthService {
   Future<void> _saveUserToPrefs(User user) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userData', json.encode(user.toJson()));
+  }
+
+  Future<void> saveAuthData(Map<String, dynamic> data) async {
+    final user = User.fromJson(data['user']);
+    await _saveToken(data['token']);
+    await _saveUserToPrefs(user);
   }
 }
