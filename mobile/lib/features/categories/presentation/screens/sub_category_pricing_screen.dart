@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/features/auth/presentation/screens/auth_check_screen.dart';
 import 'package:mobile/features/categories/domain/models/category.dart';
 import 'package:mobile/features/provider_dashboard/domain/services/provider_service.dart';
 
@@ -38,46 +39,43 @@ class _SubCategoryPricingScreenState
   }
 
   Future<void> _savePrices() async {
-    log('===== SUB CATEGORY PRICING SCREEN: _savePrices START =====');
     setState(() {
       _isSaving = true;
     });
 
-    final List<Map<String, dynamic>> services = [];
-    for (var category in widget.categories) {
-      final price = int.tryParse(_priceControllers[category.id]!.text);
-      if (price != null) {
-        services.add({
-          'category': category.id,
-          'price': price,
-        });
-      }
-    }
-    log('[SubCategoryPricingScreen] Constructed services payload: $services');
-
     try {
-      log('[SubCategoryPricingScreen] 1. BEFORE await providerService.updateServices');
-      await _providerService.updateServices(services);
-      log('[SubCategoryPricingScreen] 2. AFTER await providerService.updateServices');
-      
-      log('[SubCategoryPricingScreen] 5. BEFORE Navigator.pop');
-      if (mounted) {
-        Navigator.of(context).pop(true); // Pop and return true on success
+      final List<Map<String, dynamic>> services = [];
+      for (var category in widget.categories) {
+        final price = int.tryParse(_priceControllers[category.id]!.text);
+        if (price != null) {
+          services.add({
+            'category': category.id,
+            'price': price,
+          });
+        }
       }
-      log('[SubCategoryPricingScreen] 6. AFTER Navigator.pop');
-    } catch (e) {
-      log('[SubCategoryPricingScreen] Error saving prices: $e');
+
+      await _providerService.updateServices(services);
+
       if (mounted) {
-        Navigator.of(context).pop(false); // Pop and return false on failure
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const AuthCheckScreen()),
+          (Route<dynamic> route) => false,
+        );
+      }
+    } catch (e) {
+      log('Error saving prices: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving prices: $e')),
+        );
       }
     } finally {
-      log('[SubCategoryPricingScreen] 7. Entering FINALLY block');
       if (mounted) {
         setState(() {
           _isSaving = false;
         });
       }
-      log('===== SUB CATEGORY PRICING SCREEN: _savePrices END =====');
     }
   }
 

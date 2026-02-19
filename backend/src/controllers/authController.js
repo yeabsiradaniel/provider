@@ -26,9 +26,6 @@ const verifyOtp = async (req, res) => {
     try {
         const userData = { firstName, lastName, pin, role, profilePhoto, idPhoto };
         const { user, token, isNewUser } = await authService.verifyOtp(phoneNumber, otp, userData);
-        console.log('\n==== AUTH CONTROLLER: verifyOtp Response ====');
-        console.log(`[authController] Sending response: { user: ..., token: ..., isNewUser: ${isNewUser} }`);
-        console.log('===========================================');
         res.status(200).json({ user, token, isNewUser });
     } catch (error) {
         console.error('Verify OTP Error:', error);

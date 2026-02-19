@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/features/categories/domain/models/category.dart';
 import 'package:mobile/features/categories/domain/services/category_service.dart';
 import 'package:mobile/features/provider_dashboard/domain/services/provider_service.dart';
+import 'package:mobile/features/categories/presentation/screens/sub_category_pricing_screen.dart';
 import 'package:mobile/features/provider_profile/domain/providers/provider_profile_provider.dart';
 import 'package:mobile/features/user/domain/providers/user_provider.dart';
 import 'package:mobile/l10n/app_localizations.dart';
@@ -58,12 +59,24 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
     try {
       final user = ref.read(userProvider).value;
       if (user == null) return;
+      
+      final leafNodeIds = _getLeafNodes(_categories, _selectedCategoryIds);
       // We only want to save the leaf nodes
-      final leafNodes = _getLeafNodes(_categories, _selectedCategoryIds);
-      await _providerService.updateCategories(leafNodes.toList());
+      await _providerService.updateCategories(leafNodeIds.toList());
+      
       // After saving, refresh the provider profile to get the updated list
       await ref.read(providerProfileProvider(user.id).notifier).fetchProviderProfile();
-      _navigateToDashboard();
+      
+      final leafNodeObjects = _getLeafCategoryObjects(_categories, _selectedCategoryIds);
+
+      // Navigate to the next step: Pricing
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => SubCategoryPricingScreen(categories: leafNodeObjects),
+          ),
+        );
+      }
     } catch (e) {
       log('Error saving categories: $e');
     } finally {
@@ -94,6 +107,24 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
     return leafNodes;
   }
 
+  List<Category> _getLeafCategoryObjects(List<Category> categories, Set<String> selectedIds) {
+    final leafNodes = <Category>[];
+    void traverse(Category category) {
+      if (category.subCategories.isEmpty) {
+        if (selectedIds.contains(category.id)) {
+          leafNodes.add(category);
+        }
+      } else {
+        for (var sub in category.subCategories) {
+          traverse(sub);
+        }
+      }
+    }
+    for (var cat in categories) {
+      traverse(cat);
+    }
+    return leafNodes;
+  }
 
   void _navigateToDashboard() {
     Navigator.of(context).pop();

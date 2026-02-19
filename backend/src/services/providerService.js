@@ -95,9 +95,11 @@ const searchProviders = async (categoryIds, userLocation) => {
 };
 
 const updateCategories = async (userId, categoryIds) => {
+    const serviceCategoryObjects = categoryIds.map(id => ({ category: id }));
+
     return await ProviderProfile.findOneAndUpdate(
         { userId },
-        { serviceCategories: categoryIds },
+        { serviceCategories: serviceCategoryObjects },
         { new: true }
     );
 };
