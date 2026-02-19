@@ -233,6 +233,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                 'providerId': widget.providerId,
                 'providerName':
                     '${_provider!.user.firstName} ${_provider!.user.lastName}',
+                'profilePhoto': _provider!.user.profilePhoto,
                 'description': _descriptionController.text,
                 'startDate': _selectedDateRange!.start.toIso8601String(),
                 'endDate': _selectedDateRange!.end.toIso8601String(),
