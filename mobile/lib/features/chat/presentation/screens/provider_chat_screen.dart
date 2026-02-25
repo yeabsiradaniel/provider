@@ -5,6 +5,7 @@ import 'package:mobile/features/bookings/domain/models/job.dart';
 import 'package:mobile/features/bookings/domain/services/job_service.dart';
 import 'package:mobile/features/chat/domain/models/message.dart';
 import 'package:mobile/features/chat/domain/services/chat_service.dart';
+import 'package:mobile/features/provider_schedule/domain/providers/provider_schedule_provider.dart';
 import 'package:mobile/features/user/domain/providers/user_provider.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'dart:developer';
@@ -25,15 +26,19 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
   List<Message> _messages = [];
   bool _isLoading = true;
   bool _isAccepting = false;
+  bool _isDeclining = false;
 
   @override
   void initState() {
     super.initState();
+    log('--- [LOG] ProviderChatScreen: initState ---');
     _fetchMessages();
     
+    log('--- [LOG] ProviderChatScreen: Setting up socket listeners... ---');
     final socketService = ref.read(socketServiceProvider);
     socketService.joinJobRoom(widget.job.id);
     socketService.listenForMessages((data) {
+       log('--- [LOG] ProviderChatScreen: Message received from socket. ---');
        final message = Message.fromJson(data);
        if (mounted) {
         setState(() {
@@ -41,6 +46,7 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
         });
       }
     });
+    log('--- [LOG] ProviderChatScreen: Socket listeners set up. ---');
   }
 
   @override
@@ -81,13 +87,12 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
       'text': _messageController.text,
     };
     
-    try {
-      await _chatService.postMessage(messageData);
-      ref.read(socketServiceProvider).sendMessage(messageData);
-      _messageController.clear();
-    } catch (e) {
-      log('Error sending message: $e');
-    }
+    log('--- [LOG] ProviderChatScreen: Emitting sendMessage via socket. ---');
+    // Only send the message via the socket.
+    ref.read(socketServiceProvider).sendMessage(messageData);
+
+    // Clear the input field immediately.
+    _messageController.clear();
   }
 
   Future<void> _acceptRequest() async {
@@ -97,6 +102,7 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
     try {
       await _jobService.acceptJob(widget.job.id);
       log('Job ${widget.job.id} accepted');
+      ref.refresh(providerScheduleProvider);
       Navigator.of(context).pop(true);
     } catch (e) {
       log('Error accepting job: $e');
@@ -109,21 +115,53 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
     }
   }
 
+  Future<void> _declineRequest() async {
+    setState(() {
+      _isDeclining = true;
+    });
+    try {
+      await _jobService.declineJob(widget.job.id);
+      log('Job ${widget.job.id} declined');
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      log('Error declining job: $e');
+    } finally {
+       if (mounted) {
+        setState(() {
+          _isDeclining = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentUser = ref.watch(userProvider).value;
+    final bool isActionable = widget.job.status == 'PENDING';
+    final bool isProcessing = _isAccepting || _isDeclining;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Chat with ${widget.job.clientId?.firstName ?? 'Client'}'),
         actions: [
-          if(widget.job.status == 'PENDING')
-            TextButton(
-              onPressed: _isAccepting ? null : _acceptRequest,
-              child: _isAccepting
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(l10n.accept),
-            ),
+          if (isActionable)
+            Row(
+              children: [
+                TextButton(
+                  onPressed: isProcessing ? null : _declineRequest,
+                  child: _isDeclining
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(l10n.decline, style: const TextStyle(color: Colors.red)),
+                ),
+                TextButton(
+                  onPressed: isProcessing ? null : _acceptRequest,
+                  child: _isAccepting
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(l10n.accept),
+                ),
+              ],
+            )
         ],
       ),
       body: _isLoading 

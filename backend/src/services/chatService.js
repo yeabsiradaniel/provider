@@ -24,10 +24,38 @@ const createMessage = async (senderId, messageData) => {
         text
     });
     await message.save();
+
+    // Update the parent job to refresh the 'updatedAt' timestamp.
+    // This ensures the conversation moves to the top of the list.
+    await Job.findByIdAndUpdate(jobId, { updatedAt: new Date() });
+
     return message;
 };
 
+const getConversations = async (user) => {
+    const userId = user.id;
+    const userRole = user.role;
+
+    let matchQuery;
+
+    if (userRole === 'provider') {
+        matchQuery = { providerId: userId };
+    } else { // Assumes 'client'
+        matchQuery = { clientId: userId };
+    }
+
+    const jobs = await Job.find({
+        ...matchQuery,
+        status: { $in: ['PENDING', 'ACCEPTED', 'ACTIVE', 'COMPLETED'] }
+    })
+    .populate('clientId', 'firstName lastName profilePhoto phone role')
+    .populate('providerId', 'firstName lastName profilePhoto phone role')
+    .sort({ updatedAt: -1 }); 
+
+    return jobs;
+};
 module.exports = {
     getMessages,
     createMessage,
+    getConversations,
 };

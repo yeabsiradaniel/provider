@@ -3,6 +3,8 @@ const jobService = require('../services/jobService');
 const createJob = async (req, res) => {
     try {
         const job = await jobService.createJob(req.user.id, req.body);
+        // Emit real-time event to the specific provider
+        req.io.to(job.providerId.toString()).emit('newJobRequest', job);
         res.status(201).json(job);
     } catch (error) {
         res.status(500).json({ message: 'Error creating job.', error: error.message });
@@ -22,7 +24,8 @@ const acceptJob = async (req, res) => {
 const finishJob = async (req, res) => {
     try {
         const job = await jobService.finishJob(req.params.id, req.user.id);
-        req.io.to(job._id.toString()).emit('jobFinished', job);
+        // Emit the event ONLY to the client.
+        req.io.to(job.clientId.toString()).emit('jobFinished', job);
         res.status(200).json(job);
     } catch (error) {
         res.status(400).json({ message: 'Error finishing job.', error: error.message });
@@ -69,6 +72,26 @@ const getProviderSchedule = async (req, res) => {
     }
 };
 
+const getUnratedJobForClient = async (req, res) => {
+    try {
+        const job = await jobService.getUnratedJobForClient(req.user.id);
+        res.status(200).json(job);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching unrated job.', error: error.message });
+    }
+};
+
+const declineJob = async (req, res) => {
+    try {
+        const job = await jobService.declineJob(req.params.id, req.user.id);
+        // Optionally notify the client in real-time
+        // req.io.to(job.clientId.toString()).emit('jobDeclined', job);
+        res.status(200).json(job);
+    } catch (error) {
+        res.status(400).json({ message: 'Error declining job.', error: error.message });
+    }
+};
+
 module.exports = {
     createJob,
     acceptJob,
@@ -77,4 +100,6 @@ module.exports = {
     getJobsForClient,
     getIncomingJobs,
     getProviderSchedule,
+    getUnratedJobForClient,
+    declineJob,
 };

@@ -835,6 +835,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Accept'**
   String get accept;
+
+  /// No description provided for @decline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get decline;
+
+  /// No description provided for @rateAndPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate & Pay'**
+  String get rateAndPay;
+
+  /// No description provided for @howWasYourService.
+  ///
+  /// In en, this message translates to:
+  /// **'How was your service?'**
+  String get howWasYourService;
+
+  /// No description provided for @amountPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Paid'**
+  String get amountPaid;
+
+  /// No description provided for @pleaseEnterAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an amount'**
+  String get pleaseEnterAmount;
+
+  /// No description provided for @pleaseEnterValidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid number'**
+  String get pleaseEnterValidNumber;
+
+  /// No description provided for @submitPaymentAndReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Payment & Review'**
+  String get submitPaymentAndReview;
 }
 
 class _AppLocalizationsDelegate

@@ -9,7 +9,8 @@ class ReviewService {
     required String jobId,
     required String providerId,
     required double rating,
-    required String comment,
+    String? comment,
+    required double paidAmount,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -29,6 +30,7 @@ class ReviewService {
         'providerId': providerId,
         'rating': rating,
         'comment': comment,
+        'paidAmount': paidAmount,
       }),
     );
 

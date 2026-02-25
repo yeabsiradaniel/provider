@@ -26,11 +26,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    log('--- [LOG] ChatScreen: initState ---');
     _fetchMessages();
     
+    log('--- [LOG] ChatScreen: Setting up socket listeners... ---');
     final socketService = ref.read(socketServiceProvider);
     socketService.joinJobRoom(widget.job.id);
     socketService.listenForMessages((data) {
+       log('--- [LOG] ChatScreen: Message received from socket. ---');
        final message = Message.fromJson(data);
        if (mounted) {
         setState(() {
@@ -38,6 +41,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         });
       }
     });
+     log('--- [LOG] ChatScreen: Socket listeners set up. ---');
   }
 
   @override
@@ -71,20 +75,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final user = ref.read(userProvider).value;
     if (user == null) return;
 
+    // The receiver is the other person in the job
+    final receiverId = user.id == widget.job.clientId?.id
+        ? widget.job.providerId?.id
+        : widget.job.clientId?.id;
+
+    if (receiverId == null) {
+      log('Error: could not determine receiver ID');
+      return;
+    }
+
     final messageData = {
       'jobId': widget.job.id,
       'senderId': user.id,
-      'receiverId': widget.job.providerId,
+      'receiverId': receiverId,
       'text': _messageController.text,
     };
-    
-    try {
-      await _chatService.postMessage(messageData);
-      ref.read(socketServiceProvider).sendMessage(messageData);
-      _messageController.clear();
-    } catch (e) {
-      log('Error sending message: $e');
-    }
+
+    // Only send the message via the socket.
+    // The backend will save it and broadcast it back to everyone in the room,
+    // including the sender. The `listenForMessages` handler will then update the UI.
+    log('--- [LOG] ChatScreen: Emitting sendMessage via socket. ---');
+    ref.read(socketServiceProvider).sendMessage(messageData);
+
+    // Clear the input field immediately.
+    _messageController.clear();
   }
 
   @override

@@ -384,4 +384,25 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get accept => 'ተቀበል';
+
+  @override
+  String get decline => 'ውድቅ አድርግ';
+
+  @override
+  String get rateAndPay => 'Rate & Pay';
+
+  @override
+  String get howWasYourService => 'How was your service?';
+
+  @override
+  String get amountPaid => 'Amount Paid';
+
+  @override
+  String get pleaseEnterAmount => 'Please enter an amount';
+
+  @override
+  String get pleaseEnterValidNumber => 'Please enter a valid number';
+
+  @override
+  String get submitPaymentAndReview => 'Submit Payment & Review';
 }

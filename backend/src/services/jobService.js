@@ -2,6 +2,7 @@
 const Job = require('../models/Job');
 const AdminLedger = require('../models/AdminLedger');
 const User = require('../models/User');
+const ProviderProfile = require('../models/ProviderProfile');
 
 const createJob = async (clientId, jobData) => {
     const job = new Job({ ...jobData, clientId });
@@ -10,16 +11,20 @@ const createJob = async (clientId, jobData) => {
 };
 
 const acceptJob = async (jobId, providerId) => {
-    const job = await Job.findById(jobId);
-    if (!job || job.status !== 'PENDING') {
-        throw new Error('Job not available for acceptance.');
+    // For 1-to-1 model, we must verify the job is assigned to this provider.
+    const job = await Job.findOne({ _id: jobId, providerId: providerId });
+
+    if (!job) {
+        throw new Error('Job not found or you are not authorized to perform this action.');
     }
-    job.providerId = providerId;
+
+    if (job.status !== 'PENDING') {
+        throw new Error('This job is no longer pending and cannot be accepted.');
+    }
+
     job.status = 'ACCEPTED';
     job.acceptedAt = new Date();
     await job.save();
-    // In a real app, you would now "reveal" phone numbers,
-    // perhaps by sending a notification or updating a shared resource.
     return job;
 };
 
@@ -31,13 +36,6 @@ const finishJob = async (jobId, providerId) => {
     job.status = 'COMPLETED';
     job.completedAt = new Date();
     await job.save();
-
-    // Update provider's earnings
-    const providerProfile = await ProviderProfile.findOne({ userId: providerId });
-    if (providerProfile && job.agreedPrice) {
-        providerProfile.earnings += job.agreedPrice;
-        await providerProfile.save();
-    }
 
     // Record ledger entry for admin
     const commission = (job.agreedPrice || 0) * 0.1; // Example 10% commission
@@ -66,47 +64,54 @@ const getJobsForClient = async (clientId) => {
         .sort({ createdAt: -1 });
 };
 
-const ProviderProfile = require('../models/ProviderProfile');
-
 const getIncomingJobs = async (providerId) => {
-    try {
-        const providerProfile = await ProviderProfile.findOne({ userId: providerId });
-        if (!providerProfile) {
-            throw new Error('Provider profile not found.');
-        }
+    // Corrected to 1-to-1 model: Find jobs specifically assigned to this provider with status 'PENDING'.
+    const jobs = await Job.find({
+        providerId: providerId,
+        status: 'PENDING',
+    }).populate('clientId', 'firstName lastName profilePhoto phone role')
+      .sort({ createdAt: -1 });
 
-        const jobs = await Job.find({
-            status: 'PENDING',
-            serviceCategory: { $in: providerProfile.serviceCategories },
-        }).populate('clientId', 'firstName lastName profilePhoto phone role');
-
-        return jobs;
-    } catch (error) {
-        console.error('Error in getIncomingJobs:', error);
-        throw error;
-    }
+    return jobs;
 };
 
 const getProviderSchedule = async (providerId) => {
-    const populateFields = 'clientId providerId';
-    const populateProjection = 'firstName lastName profilePhoto phone role';
-
-    // Fetch pending jobs, sorted by date
-    const pendingJobs = await Job.find({ providerId, status: 'PENDING' })
-        .populate(populateFields, populateProjection)
-        .sort({ createdAt: -1 });
-    
-    // Fetch other jobs, sorted by date
-    const otherJobs = await Job.find({
+    // Corrected to only show jobs that are accepted or completed. 
+    // Pending jobs are handled by getIncomingJobs.
+    const jobs = await Job.find({
         providerId,
         status: { $in: ['ACCEPTED', 'COMPLETED'] },
     })
-    .populate(populateFields, populateProjection)
+    .populate('clientId', 'firstName lastName profilePhoto phone role')
     .sort({ createdAt: -1 });
 
-    const jobs = [...pendingJobs, ...otherJobs];
-
     return jobs;
+};
+
+const getUnratedJobForClient = async (clientId) => {
+    // Find the first completed job for this client that has not been rated yet.
+    return await Job.findOne({
+        clientId: clientId,
+        status: 'COMPLETED',
+        isRated: false,
+    }).sort({ completedAt: -1 }); // Get the most recently completed one first
+};
+
+const declineJob = async (jobId, providerId) => {
+    // For 1-to-1 model, we must verify the job is assigned to this provider.
+    const job = await Job.findOne({ _id: jobId, providerId: providerId });
+
+    if (!job) {
+        throw new Error('Job not found or you are not authorized to perform this action.');
+    }
+
+    if (job.status !== 'PENDING') {
+        throw new Error('This job is no longer pending and cannot be declined.');
+    }
+
+    job.status = 'DECLINED';
+    await job.save();
+    return job;
 };
 
 module.exports = {
@@ -117,4 +122,6 @@ module.exports = {
     getJobsForClient,
     getIncomingJobs,
     getProviderSchedule,
+    getUnratedJobForClient,
+    declineJob,
 };

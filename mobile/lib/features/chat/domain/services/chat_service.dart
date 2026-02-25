@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/features/chat/domain/models/message.dart';
+import 'package:mobile/features/bookings/domain/models/job.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatService {
@@ -29,7 +33,7 @@ class ChatService {
     }
   }
 
-  Future<void> postMessage(Map<String, dynamic> messageData) async {
+  Future<Message> postMessage(Map<String, dynamic> messageData) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -46,8 +50,46 @@ class ChatService {
       body: jsonEncode(messageData),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode == 201) {
+      return Message.fromJson(json.decode(response.body));
+    } else {
       throw Exception('Failed to post message');
+    }
+  }
+
+  Future<List<Job>> getConversations() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('No token found');
+    }
+
+    final endpoint = '$_baseUrl/chat/conversations';
+    if (kDebugMode) {
+      log('===== CUSTOMER CHAT LIST REQUEST START =====');
+      log('Endpoint: $endpoint');
+      log('Token: $token');
+    }
+
+    final response = await http.get(
+      Uri.parse(endpoint),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (kDebugMode) {
+      log('===== CUSTOMER CHAT LIST RESPONSE RAW =====');
+      log('Status Code: ${response.statusCode}');
+      log('Body: ${response.body}');
+    }
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((job) => Job.fromJson(job)).toList();
+    } else {
+      throw Exception('Failed to load conversations');
     }
   }
 }

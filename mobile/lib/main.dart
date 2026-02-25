@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/services/socket_service.dart';
 import 'package:mobile/features/auth/presentation/screens/auth_check_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer';
 
 final localeProvider = StateProvider<Locale>((ref) => const Locale('en'));
 
@@ -33,10 +35,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Initialize the socket service and navigator key
+    // Get the navigatorKey from its provider.
     final navigatorKey = ref.watch(navigatorKeyProvider);
-    ref.watch(socketServiceProvider);
-
+    
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeProvider);
 
@@ -49,7 +50,15 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData.light(), // Define your light theme
       darkTheme: ThemeData.dark(), // Define your dark theme
       themeMode: themeMode,
-      home: const AuthCheckScreen(),
+      // Use a Builder to ensure we have a clean startup sequence.
+      home: Builder(
+        builder: (context) {
+          // Initialize the socket service.
+          ref.read(socketServiceProvider).initSocket();
+          // Return the first screen of the app.
+          return const AuthCheckScreen();
+        },
+      ),
       debugShowCheckedModeBanner: false,
     );
   }

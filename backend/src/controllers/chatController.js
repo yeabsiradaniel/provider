@@ -9,16 +9,17 @@ const getMessages = async (req, res) => {
     }
 };
 
-const postMessage = async (req, res) => {
+const getConversations = async (req, res) => {
     try {
-        const message = await chatService.createMessage(req.user.id, req.body);
-        res.status(201).json(message);
+        // The user object (with role) is attached by the authMiddleware
+        const conversations = await chatService.getConversations(req.user);
+        res.status(200).json(conversations);
     } catch (error) {
-        res.status(500).json({ message: 'Error posting message.', error: error.message });
+        res.status(500).json({ message: 'Error fetching conversations.', error: error.message });
     }
 };
 
 module.exports = {
     getMessages,
-    postMessage,
+    getConversations,
 };

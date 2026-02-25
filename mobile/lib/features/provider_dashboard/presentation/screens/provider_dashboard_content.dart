@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/core/services/socket_service.dart';
 import 'package:mobile/features/bookings/domain/models/job.dart';
 import 'package:mobile/features/chat/presentation/screens/provider_chat_screen.dart';
 import 'package:mobile/features/provider_dashboard/domain/services/dashboard_service.dart';
@@ -44,7 +44,6 @@ class _ProviderDashboardContentState
         });
       }
     } catch (e) {
-      log('Error fetching incoming jobs: $e');
       if (mounted) {
         setState(() {
           _isLoadingJobs = false;
@@ -61,7 +60,7 @@ class _ProviderDashboardContentState
       final ProviderProfile updatedProfile = await _dashboardService.toggleStatus(newStatus);
       ref.read(providerProfileProvider(user.id).notifier).updateProviderProfile(updatedProfile);
     } catch (e) {
-      log('Error toggling status: $e');
+      // Handle or log error appropriately
     }
   }
 
@@ -69,6 +68,13 @@ class _ProviderDashboardContentState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(userProvider).value;
+
+    // Listen for real-time new job requests
+    ref.listen<int>(newRequestNotifierProvider, (previous, next) {
+      if (next > (previous ?? 0)) {
+        _fetchIncomingJobs();
+      }
+    });
 
     if (user == null) {
       return const Scaffold(

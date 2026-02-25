@@ -71,6 +71,26 @@ class JobService {
     }
   }
 
+  Future<void> declineJob(String jobId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('No token found');
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/jobs/$jobId/decline'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to decline job');
+    }
+  }
+
   Future<void> finishJob(String jobId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -88,6 +108,31 @@ class JobService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to finish job');
+    }
+  }
+
+  Future<Job?> getUnratedJobForClient() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('No token found');
+    }
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/jobs/unrated'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      final jsonResponse = json.decode(response.body);
+      return Job.fromJson(jsonResponse);
+    } else if (response.statusCode == 200) {
+      return null;
+    } else {
+      throw Exception('Failed to fetch unrated job');
     }
   }
 }

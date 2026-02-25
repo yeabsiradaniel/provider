@@ -1,8 +1,15 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/core/config.dart';
 import 'package:mobile/features/bookings/domain/models/job.dart';
-import 'package:mobile/features/bookings/domain/services/job_service.dart';
+import 'package:mobile/features/chat/domain/services/chat_service.dart';
 import 'package:mobile/features/chat/presentation/screens/chat_screen.dart';
+import 'package:mobile/features/chat/presentation/screens/provider_chat_screen.dart';
+import 'package:mobile/features/user/domain/models/user.dart';
+import 'package:mobile/features/user/domain/providers/user_provider.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 class ChatListScreen extends ConsumerStatefulWidget {
@@ -13,36 +20,55 @@ class ChatListScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatListScreenState extends ConsumerState<ChatListScreen> {
-  final JobService _jobService = JobService();
-  List<Job> _jobs = [];
+  final ChatService _chatService = ChatService();
+  List<Job> _conversations = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchJobs();
+    _fetchConversations();
   }
 
-  Future<void> _fetchJobs() async {
+  Future<void> _fetchConversations() async {
+    if (kDebugMode) {
+      log('===== CUSTOMER CHAT LIST NAVIGATION =====');
+    }
     try {
-      // We can reuse the getBookingHistory since it returns all jobs for the client
-      final jobs = await _jobService.getBookingHistory();
-      // We only want to show chats for accepted or in-progress jobs
-      final filteredJobs = jobs.where((job) => job.status == 'ACCEPTED' || job.status == 'ACTIVE').toList();
-      setState(() {
-        _jobs = filteredJobs;
-        _isLoading = false;
-      });
+      final jobs = await _chatService.getConversations();
+      if (kDebugMode) {
+        log('===== CUSTOMER CHAT LIST PARSED MODEL =====');
+        log('Parsed conversations count: ${jobs.length}');
+      }
+      if (mounted) {
+        setState(() {
+          if (kDebugMode) {
+            log('===== CUSTOMER CHAT LIST STATE UPDATE =====');
+            log('Updating state with ${jobs.length} conversations.');
+          }
+          _conversations = jobs;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-       setState(() {
-        _isLoading = false;
-      });
+      if (kDebugMode) {
+        log('Error fetching conversations: $e');
+      }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
       // Handle error
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (kDebugMode) {
+      log('===== CUSTOMER CHAT LIST UI BUILD =====');
+      log('Final list length used by UI: ${_conversations.length}');
+    }
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
@@ -50,36 +76,57 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _jobs.isEmpty
+          : _conversations.isEmpty
               ? Center(child: Text("You have no active chats."))
               : ListView.builder(
-                  itemCount: _jobs.length,
+                  itemCount: _conversations.length,
                   itemBuilder: (context, index) {
-                    final job = _jobs[index];
-                    return _buildChatItem(
-                      context,
-                      job: job
-                    );
+                    final job = _conversations[index];
+                    return _buildChatItem(context, job: job);
                   },
                 ),
     );
   }
 
   Widget _buildChatItem(BuildContext context, {required Job job}) {
+    final currentUser = ref.watch(userProvider).value;
+    final bool isProvider = currentUser?.role == 'provider';
+
+    // Determine the other user in the chat
+    final User? otherUser = isProvider ? job.clientId : job.providerId;
+
+    ImageProvider? backgroundImage;
+    final photoPath = otherUser?.profilePhoto;
+
+    if (photoPath != null && photoPath.isNotEmpty) {
+      if (photoPath.startsWith('/uploads/')) {
+        backgroundImage = NetworkImage('$baseUrl$photoPath');
+      } else if (photoPath.startsWith('http')) {
+        backgroundImage = NetworkImage(photoPath);
+      }
+    }
+
     return ListTile(
-      // We need to fetch provider details to show their name and photo
-      leading: const CircleAvatar(
-        child: Icon(Icons.person),
+      leading: CircleAvatar(
+        backgroundImage: backgroundImage,
+        child: backgroundImage == null
+            ? Text(otherUser?.firstName.substring(0, 1) ?? '?')
+            : null,
       ),
-      title: Text("Chat for: ${job.serviceName}"),
-      subtitle: const Text("Click to view messages"), // This should be the last message
+      title: Text(otherUser?.firstName ?? 'Chat'),
+      subtitle: Text(job.serviceName), // This could be the last message
       onTap: () {
+        // Navigate to the correct chat screen based on user role
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChatScreen(
-              job: job,
-            ),
+            builder: (context) {
+              if (isProvider) {
+                return ProviderChatScreen(job: job);
+              } else {
+                return ChatScreen(job: job);
+              }
+            },
           ),
         );
       },

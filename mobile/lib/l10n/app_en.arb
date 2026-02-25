@@ -122,5 +122,12 @@
   "confirmBooking": "Confirm Booking",
   "addAComment": "Add a comment...",
   "submitReview": "Submit Review",
-  "accept": "Accept"
+  "accept": "Accept",
+  "decline": "Decline",
+  "rateAndPay": "Rate & Pay",
+  "howWasYourService": "How was your service?",
+  "amountPaid": "Amount Paid",
+  "pleaseEnterAmount": "Please enter an amount",
+  "pleaseEnterValidNumber": "Please enter a valid number",
+  "submitPaymentAndReview": "Submit Payment & Review"
 }

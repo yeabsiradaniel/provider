@@ -13,6 +13,11 @@ router.post('/', authMiddleware, isClient, jobController.createJob);
 // @access  Private (Provider only)
 router.post('/:id/accept', authMiddleware, isProvider, jobController.acceptJob);
 
+// @route   POST /api/jobs/:id/decline
+// @desc    Provider declines a job
+// @access  Private (Provider only)
+router.post('/:id/decline', authMiddleware, isProvider, jobController.declineJob);
+
 // @route   POST /api/jobs/:id/finish
 // @desc    Provider marks a job as finished
 // @access  Private (Provider only)
@@ -32,6 +37,11 @@ router.get('/incoming', authMiddleware, isProvider, jobController.getIncomingJob
 // @desc    Get job history for the current client
 // @access  Private (Client only)
 router.get('/client', authMiddleware, isClient, jobController.getJobsForClient);
+
+// @route   GET /api/jobs/unrated
+// @desc    Get a single unrated, completed job for the current client
+// @access  Private (Client only)
+router.get('/unrated', authMiddleware, isClient, jobController.getUnratedJobForClient);
 
 // @route   GET /api/jobs/user/:userId
 // @desc    Get job history for a user (client or provider)

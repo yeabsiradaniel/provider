@@ -2,9 +2,11 @@
 const Review = require('../models/Review');
 const User = require('../models/User');
 const Job = require('../models/Job');
+const ProviderProfile = require('../models/ProviderProfile');
+
 
 const createReview = async (clientId, reviewData) => {
-    const { jobId, rating } = reviewData;
+    const { jobId, rating, paidAmount } = reviewData;
 
     // Ensure the client who is reviewing was part of the job
     const job = await Job.findOne({ _id: jobId, clientId: clientId });
@@ -22,14 +24,26 @@ const createReview = async (clientId, reviewData) => {
     });
     await review.save();
 
+    // Mark the job as rated
+    job.isRated = true;
+    job.agreedPrice = paidAmount; // Also update the job's price with what was actually paid
+    await job.save();
+
     // Update provider's average rating (this is a simplified approach)
-    const stats = await Review.aggregate([
+    const ratingStats = await Review.aggregate([
         { $match: { providerId: job.providerId } },
         { $group: { _id: '$providerId', avgRating: { $avg: '$rating' } } }
     ]);
 
-    if (stats.length > 0) {
-        await User.findByIdAndUpdate(job.providerId, { rating: stats[0].avgRating });
+    if (ratingStats.length > 0) {
+        await User.findByIdAndUpdate(job.providerId, { rating: ratingStats[0].avgRating });
+    }
+
+    // Update provider's earnings
+    const providerProfile = await ProviderProfile.findOne({ userId: job.providerId });
+    if (providerProfile && paidAmount) {
+        providerProfile.earnings += paidAmount;
+        await providerProfile.save();
     }
 
     return review;

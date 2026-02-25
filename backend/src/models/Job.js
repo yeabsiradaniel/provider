@@ -35,7 +35,7 @@ const jobSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['PENDING', 'ACCEPTED', 'ACTIVE', 'COMPLETED'],
+        enum: ['PENDING', 'ACCEPTED', 'ACTIVE', 'COMPLETED', 'DECLINED'],
         default: 'PENDING',
     },
     acceptedAt: {
@@ -43,6 +43,10 @@ const jobSchema = new Schema({
     },
     completedAt: {
         type: Date,
+    },
+    isRated: {
+        type: Boolean,
+        default: false,
     },
 }, { timestamps: true });
 

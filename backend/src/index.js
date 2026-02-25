@@ -14,6 +14,7 @@ const categoryRoutes = require('./routes/category');
 const userRoutes = require('./routes/user');
 const searchRoutes = require('./routes/search');
 const chatRoutes = require('./routes/chat'); // Import chat routes
+const chatService = require('./services/chatService'); // Import chat service
 
 const app = express();
 const server = http.createServer(app);
@@ -56,22 +57,46 @@ app.use('/api/users', userRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/chat', chatRoutes); // Use chat routes
 
+const jwt = require('jsonwebtoken');
+
+// --- Socket.IO Authentication Middleware ---
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+        return next(new Error('Authentication error: Token not provided'));
+    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return next(new Error('Authentication error: Invalid token'));
+        }
+        socket.user = decoded; // Attach user info to the socket
+        next();
+    });
+});
+
 // --- Socket.IO Connection ---
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('a user connected:', socket.user.userId);
+
+  // Automatically join a room based on the user's ID
+  socket.join(socket.user.userId);
 
   socket.on('joinJobRoom', (jobId) => {
     socket.join(jobId);
-    console.log(`User joined room for job: ${jobId}`);
+    console.log(`User ${socket.user.userId} joined room for job: ${jobId}`);
   });
 
-  socket.on('sendMessage', (data) => {
-    // When a message is sent, broadcast it to the specific job room
-    io.to(data.jobId).emit('receiveMessage', data);
+  socket.on('sendMessage', async (data) => {
+    try {
+      const message = await chatService.createMessage(socket.user.userId, data);
+      io.to(data.jobId).emit('receiveMessage', message);
+    } catch (error) {
+      console.error('Socket sendMessage error:', error);
+    }
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    console.log('user disconnected:', socket.user.userId);
   });
 });
 

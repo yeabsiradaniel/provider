@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const ProviderProfile = require('../models/ProviderProfile');
 const User = require('../models/User');
 const Category = require('../models/Category');
+const Job = require('../models/Job');
 
 // Haversine formula to calculate distance between two lat/lng points
 const haversineDistance = (coords1, coords2) => {
@@ -130,8 +131,6 @@ const getDashboardMetrics = async (providerId) => {
         avgRating: user.rating,
     };
 };
-
-const Job = require('../models/Job');
 
 const getEarnings = async (providerId) => {
     const completedJobs = await Job.find({

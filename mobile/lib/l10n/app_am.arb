@@ -122,5 +122,12 @@
   "confirmBooking": "ቦታ ማስያዝ ያረጋግጡ",
   "addAComment": "አስተያየት ያክሉ...",
   "submitReview": "ግምገማ ያስገቡ",
-  "accept": "ተቀበል"
+  "accept": "ተቀበል",
+  "decline": "ውድቅ አድርግ",
+  "rateAndPay": "Rate & Pay",
+  "howWasYourService": "How was your service?",
+  "amountPaid": "Amount Paid",
+  "pleaseEnterAmount": "Please enter an amount",
+  "pleaseEnterValidNumber": "Please enter a valid number",
+  "submitPaymentAndReview": "Submit Payment & Review"
 }
