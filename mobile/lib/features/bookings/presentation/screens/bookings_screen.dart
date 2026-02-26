@@ -18,7 +18,7 @@ class BookingsScreen extends ConsumerWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: bookingsAsyncValue.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(child: Text('${l10n.errorPrefix}$err')),
         data: (jobs) {
           return RefreshIndicator(
             onRefresh: () => ref.refresh(customerBookingsProvider.future),

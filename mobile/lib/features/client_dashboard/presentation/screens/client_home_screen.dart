@@ -219,8 +219,8 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
         body: userAsyncValue.when(
           data: (user) {
             if (user == null) {
-              return const Center(
-                  child: Text('User not found. Please restart the app.'));
+              return Center(
+                  child: Text(l10n.userNotFoundRestart));
             }
             return CustomScrollView(
               slivers: [
@@ -381,7 +381,7 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
           },
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, stack) =>
-              const Center(child: Text('Error loading profile.')),
+              Center(child: Text(l10n.errorLoadingProfile)),
         ));
   }
 

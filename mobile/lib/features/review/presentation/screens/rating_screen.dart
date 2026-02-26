@@ -55,22 +55,24 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
       ref.refresh(providerEarningsProvider);
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const ClientHomeScreen()),
           (Route<dynamic> route) => false,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Thank you for your payment and feedback!')),
+          SnackBar(content: Text(l10n.thankYouForPaymentAndFeedback)),
         );
       }
     } catch (e) {
       log('Error submitting review: $e');
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         setState(() {
           _isSubmitting = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit review: $e')),
+          SnackBar(content: Text('${l10n.failedToSubmitReview}$e')),
         );
       }
     }

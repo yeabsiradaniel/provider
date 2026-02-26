@@ -492,4 +492,117 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get providerAgreementText =>
       '(Independent Contractor Agreement)\nThis Agreement is entered into between:\nFIXADDIS (“Platform”)\nand\nThe registered Service Provider (“Provider”).\n\nBy signing or using the Platform, the Provider agrees to the following:\n\n1️⃣ Relationship\n\n1.1 The Provider is an independent contractor, not an employee, partner, or agent of FixAddis.\n1.2 The Provider is responsible for all taxes, permits, tools, transport, insurance (if applicable), and operational costs.\n1.3 FixAddis acts only as a digital marketplace connecting customers and Providers.\n\n2️⃣ Scope of Services\n\nThe Provider may offer services including but not limited to:\nRoadside mechanic services\nHome repair (plumbing, electrical, carpentry, etc.)\nAppliance repair\nCleaning services\nInstallation services\nAny other approved skilled service listed on the Platform\nProviders may only perform services they are qualified to perform.\n\n3️⃣ Verification & Eligibility\n\nPlatform confirms:\nValid identification submitted\nAccurate personal and contact details\nSufficient skill and experience\nAny legally required licenses\nLegal eligibility of provider to provide services in Ethiopia\nProviding false information results in immediate termination.\n\n4️⃣ Professional Conduct & Discipline \n\nProvider agrees to:\nTreat customers respectfully\nClearly explain pricing before starting work\nObtain customer approval before additional charges\nArrive within reasonable time\nMaintain professional appearance and behaviour \n\nProvider shall NOT:\n\nHarass, threaten, or intimidate customers\nOvercharge or manipulate pricing unfairly\nPerform services under alcohol or drug influence\nEngage in discrimination\nDemand payment beyond agreed amount\nMisrepresent FIXADDIS\nSerious violations result in immediate termination.\n\n5️⃣ Safety Obligations\n\nProvider is fully responsible for:\n\nSafe work practices\nUse of proper tools\nRoadside and site safety\nAvoiding damage to property\nCompliance with traffic and safety laws\n\nFixAddis is not liable for:\n\nInjuries\nProperty damage\nMechanical failure\nWork defects caused by Provider negligence\nProvider assumes full legal responsibility for services performed.\n\n6️⃣ Pricing & Commission\n\n6.1 Provider agrees to follow platform pricing guidelines.\n6.2 Final price must be agreed before work begins.\n6.3 Provider agrees to pay agreed commission or platform fees.\n6.4 Failure to pay commission may result in suspension and legal recovery.\n\n7️⃣ Anti-Bypass Clause\n\nProvider agrees:\nNot to solicit customers outside the Platform\nNot to share personal contact details for future direct jobs\nNot to intentionally avoid commission\nViolation may result in permanent removal and financial penalty.\n\n8️⃣ Ratings & Performance Monitoring\n\nFIXADDIS may monitor:\n\nCustomer ratings\nResponse time\nComplaint frequency\nJob completion rate\nPrice fairness\n\nProviders with repeated low performance may face:\n\nWarning\nTemporary suspension\nPermanent termination.\n\n9️⃣ Customer Complaints & Refunds\n\nProvider agrees to:\n\nCooperate with investigations\nRespond within 48 hours\nAccept fair dispute resolution\nFIXADDIS may require refunds in cases of proven misconduct.\n\n1️⃣0️⃣ Suspension & Termination\n\nFixAddis may immediately suspend or terminate access for:\n\nSafety violations\nFraud\nHarassment\nCriminal conduct\nRepeated poor ratings\nCommission evasion\nNo notice required in serious cases.\n\n1️⃣1️⃣ confidenciality\n\nProvider agrees not to disclose:\nCustomer data\nInternal policies\nPricing structures\nPlatform operational information.\n\n1️⃣2️⃣ Amendments\n\nFixAddis may update this Agreement at any time.\nContinued platform use indicates acceptance.';
+
+  @override
+  String get userNotFoundRestart => 'User not found. Please restart the app.';
+
+  @override
+  String get errorLoadingProfile => 'Error loading profile.';
+
+  @override
+  String chatWith(String name) {
+    return 'Chat with $name';
+  }
+
+  @override
+  String get client => 'Client';
+
+  @override
+  String get errorPrefix => 'Error: ';
+
+  @override
+  String get providerProfileNotFound => 'Provider profile not found.';
+
+  @override
+  String get noNewJobRequests => 'No new job requests.';
+
+  @override
+  String get thankYouForPaymentAndFeedback =>
+      'Thank you for your payment and feedback!';
+
+  @override
+  String get failedToSubmitReview => 'Failed to submit review: ';
+
+  @override
+  String get failedToFinishJob => 'Failed to finish job: ';
+
+  @override
+  String get markAsFinished => 'Mark as Finished';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get noAppointmentsForThisDay => 'No appointments for this day.';
+
+  @override
+  String get rewardsScreen => 'Rewards Screen';
+
+  @override
+  String get notLoggedIn => 'Not logged in.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profile updated successfully!';
+
+  @override
+  String get failedToUpdateProfile => 'Failed to update profile: ';
+
+  @override
+  String get userNotFound => 'User not found.';
+
+  @override
+  String get welcomeYouAreLoggedIn => 'Welcome! You are logged in.';
+
+  @override
+  String get errorSavingPrices => 'Error saving prices: ';
+
+  @override
+  String get setYourPrices => 'Set Your Prices';
+
+  @override
+  String get saveAndFinish => 'Save and Finish';
+
+  @override
+  String get failedToSendBookingRequest => 'Failed to send booking request: ';
+
+  @override
+  String get pleaseEnter6DigitCode => 'Please enter a 6-digit code.';
+
+  @override
+  String get roleSelectionScreenPlaceholder =>
+      'Role Selection Screen - Placeholder';
+
+  @override
+  String get pleaseUploadIdPhoto => 'Please upload your ID photo.';
+
+  @override
+  String get pleaseEnterPhoneNumber => 'Please enter a phone number.';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get noDescriptionProvided => 'No description provided.';
+
+  @override
+  String get resendCode => 'Resend Code';
+
+  @override
+  String get price => 'Price';
+
+  @override
+  String get monthlyBreakdown => 'Monthly Breakdown';
+
+  @override
+  String get noEarningsData => 'No earnings data available for this month.';
+
+  @override
+  String get youHaveNoActiveChats => 'You have no active chats.';
+
+  @override
+  String get enterYourPhoneNumberToReset =>
+      'Enter your phone number to reset your PIN';
+
+  @override
+  String get sendOtp => 'SEND OTP';
 }

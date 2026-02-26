@@ -38,8 +38,9 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
       setState(() {
         _isBooking = false;
       });
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send booking request: $e')),
+        SnackBar(content: Text('${l10n.failedToSendBookingRequest}$e')),
       );
     }
   }

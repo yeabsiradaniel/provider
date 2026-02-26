@@ -41,8 +41,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Future<void> _getOtp() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedRole == 1 && _idPhoto == null) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please upload your ID photo.')), // This should be localized
+          SnackBar(content: Text(l10n.pleaseUploadIdPhoto)),
         );
         return;
       }

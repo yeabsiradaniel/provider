@@ -89,8 +89,9 @@ class _EditProviderProfileScreenState
           _profileImage = null;
         });
 
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
+          SnackBar(content: Text(l10n.profileUpdatedSuccessfully)),
         );
         Navigator.of(context).pop();
       } catch (e) {
@@ -98,8 +99,9 @@ class _EditProviderProfileScreenState
         setState(() {
           _isLoading = false;
         });
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile: ${e.toString()}')),
+          SnackBar(content: Text('${l10n.failedToUpdateProfile}${e.toString()}')),
         );
       }
     }
@@ -111,8 +113,8 @@ class _EditProviderProfileScreenState
     final user = ref.watch(userProvider).value;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('User not found.'))
+      return Scaffold(
+        body: Center(child: Text(l10n.userNotFound))
       );
     }
     

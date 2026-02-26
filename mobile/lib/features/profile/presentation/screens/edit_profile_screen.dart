@@ -87,8 +87,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           _profileImage = null;
         });
 
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
+          SnackBar(content: Text(l10n.profileUpdatedSuccessfully)),
         );
         Navigator.of(context).pop();
       } catch (e) {
@@ -96,8 +97,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         setState(() {
           _isLoading = false;
         });
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile: ${e.toString()}')),
+          SnackBar(content: Text('${l10n.failedToUpdateProfile}${e.toString()}')),
         );
       }
     }
@@ -113,7 +115,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         title: Text(l10n.editProfile),
       ),
       body: user == null
-          ? const Center(child: Text('User not found.'))
+          ? Center(child: Text(l10n.userNotFound))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Form(

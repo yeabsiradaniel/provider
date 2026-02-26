@@ -4,14 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/features/auth/presentation/screens/auth_check_screen.dart';
 import 'package:mobile/features/categories/domain/models/category.dart';
 import 'package:mobile/features/provider_dashboard/domain/services/provider_service.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 
 class SubCategoryPricingScreen extends ConsumerStatefulWidget {
   final List<Category> categories;
 
   const SubCategoryPricingScreen({Key? key, required this.categories})
       : super(key: key);
-
-  @override
+      
+        @override
   _SubCategoryPricingScreenState createState() =>
       _SubCategoryPricingScreenState();
 }
@@ -66,8 +67,9 @@ class _SubCategoryPricingScreenState
     } catch (e) {
       log('Error saving prices: $e');
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving prices: $e')),
+          SnackBar(content: Text('${l10n.errorSavingPrices}$e')),
         );
       }
     } finally {
@@ -81,9 +83,10 @@ class _SubCategoryPricingScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Set Your Prices'),
+        title: Text(l10n.setYourPrices),
       ),
       body: ListView.builder(
         itemCount: widget.categories.length,
@@ -101,9 +104,9 @@ class _SubCategoryPricingScreenState
                   child: TextField(
                     controller: _priceControllers[category.id],
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Price',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.price,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
@@ -118,7 +121,7 @@ class _SubCategoryPricingScreenState
           onPressed: _isSaving ? null : _savePrices,
           child: _isSaving
               ? const CircularProgressIndicator(color: Colors.white)
-              : const Text('Save and Finish'),
+              : Text(l10n.saveAndFinish),
         ),
       ),
     );

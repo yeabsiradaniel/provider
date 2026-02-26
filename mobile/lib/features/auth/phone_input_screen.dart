@@ -34,7 +34,7 @@ class PhoneInputScreen extends ConsumerWidget {
       } else {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(const SnackBar(content: Text('Please enter a phone number.')));
+          ..showSnackBar(SnackBar(content: Text(l10n.pleaseEnterPhoneNumber)));
       }
     }
 
@@ -47,19 +47,19 @@ class PhoneInputScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'እንኳን ደህና መጡ',
+                l10n.welcome,
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Welcome',
+                l10n.welcome,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 48),
               LabeledTextField(
-                label: 'Phone',
+                label: l10n.phone,
                 prefixText: '+251',
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
@@ -70,7 +70,7 @@ class PhoneInputScreen extends ConsumerWidget {
               else
                 AsymButton(
                   onPressed: _getOtp,
-                  label: 'GET OTP',
+                  label: l10n.getOtp,
                 ),
             ],
           ),

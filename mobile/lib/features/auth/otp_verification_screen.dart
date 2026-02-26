@@ -10,6 +10,7 @@ class OtpVerificationScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final otpController = TextEditingController();
     final authState = ref.watch(authNotifierProvider);
 
@@ -19,7 +20,7 @@ class OtpVerificationScreen extends ConsumerWidget {
       } else {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(const SnackBar(content: Text('Please enter a 6-digit code.')));
+          ..showSnackBar(SnackBar(content: Text(l10n.pleaseEnter6DigitCode)));
       }
     }
 
@@ -33,13 +34,13 @@ class OtpVerificationScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Verification Code',
+                l10n.enterOtp,
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Enter the 6-digit code sent to your phone.',
+                l10n.otpSentTo(phoneNumber),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
@@ -63,12 +64,12 @@ class OtpVerificationScreen extends ConsumerWidget {
               else
                 AsymButton(
                   onPressed: _verifyOtp,
-                  label: 'VERIFY',
+                  label: l10n.verify,
                 ),
                 const SizedBox(height: 16),
                 TextButton(onPressed: (){
                     // Resend code logic would go here
-                }, child: const Text("Resend Code"))
+                }, child: Text(l10n.resendCode))
             ],
           ),
         ),

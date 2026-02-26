@@ -1033,6 +1033,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'(Independent Contractor Agreement)\nThis Agreement is entered into between:\nFIXADDIS (“Platform”)\nand\nThe registered Service Provider (“Provider”).\n\nBy signing or using the Platform, the Provider agrees to the following:\n\n1️⃣ Relationship\n\n1.1 The Provider is an independent contractor, not an employee, partner, or agent of FixAddis.\n1.2 The Provider is responsible for all taxes, permits, tools, transport, insurance (if applicable), and operational costs.\n1.3 FixAddis acts only as a digital marketplace connecting customers and Providers.\n\n2️⃣ Scope of Services\n\nThe Provider may offer services including but not limited to:\nRoadside mechanic services\nHome repair (plumbing, electrical, carpentry, etc.)\nAppliance repair\nCleaning services\nInstallation services\nAny other approved skilled service listed on the Platform\nProviders may only perform services they are qualified to perform.\n\n3️⃣ Verification & Eligibility\n\nPlatform confirms:\nValid identification submitted\nAccurate personal and contact details\nSufficient skill and experience\nAny legally required licenses\nLegal eligibility of provider to provide services in Ethiopia\nProviding false information results in immediate termination.\n\n4️⃣ Professional Conduct & Discipline \n\nProvider agrees to:\nTreat customers respectfully\nClearly explain pricing before starting work\nObtain customer approval before additional charges\nArrive within reasonable time\nMaintain professional appearance and behaviour \n\nProvider shall NOT:\n\nHarass, threaten, or intimidate customers\nOvercharge or manipulate pricing unfairly\nPerform services under alcohol or drug influence\nEngage in discrimination\nDemand payment beyond agreed amount\nMisrepresent FIXADDIS\nSerious violations result in immediate termination.\n\n5️⃣ Safety Obligations\n\nProvider is fully responsible for:\n\nSafe work practices\nUse of proper tools\nRoadside and site safety\nAvoiding damage to property\nCompliance with traffic and safety laws\n\nFixAddis is not liable for:\n\nInjuries\nProperty damage\nMechanical failure\nWork defects caused by Provider negligence\nProvider assumes full legal responsibility for services performed.\n\n6️⃣ Pricing & Commission\n\n6.1 Provider agrees to follow platform pricing guidelines.\n6.2 Final price must be agreed before work begins.\n6.3 Provider agrees to pay agreed commission or platform fees.\n6.4 Failure to pay commission may result in suspension and legal recovery.\n\n7️⃣ Anti-Bypass Clause\n\nProvider agrees:\nNot to solicit customers outside the Platform\nNot to share personal contact details for future direct jobs\nNot to intentionally avoid commission\nViolation may result in permanent removal and financial penalty.\n\n8️⃣ Ratings & Performance Monitoring\n\nFIXADDIS may monitor:\n\nCustomer ratings\nResponse time\nComplaint frequency\nJob completion rate\nPrice fairness\n\nProviders with repeated low performance may face:\n\nWarning\nTemporary suspension\nPermanent termination.\n\n9️⃣ Customer Complaints & Refunds\n\nProvider agrees to:\n\nCooperate with investigations\nRespond within 48 hours\nAccept fair dispute resolution\nFIXADDIS may require refunds in cases of proven misconduct.\n\n1️⃣0️⃣ Suspension & Termination\n\nFixAddis may immediately suspend or terminate access for:\n\nSafety violations\nFraud\nHarassment\nCriminal conduct\nRepeated poor ratings\nCommission evasion\nNo notice required in serious cases.\n\n1️⃣1️⃣ confidenciality\n\nProvider agrees not to disclose:\nCustomer data\nInternal policies\nPricing structures\nPlatform operational information.\n\n1️⃣2️⃣ Amendments\n\nFixAddis may update this Agreement at any time.\nContinued platform use indicates acceptance.'**
   String get providerAgreementText;
+
+  /// No description provided for @userNotFoundRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'User not found. Please restart the app.'**
+  String get userNotFoundRestart;
+
+  /// No description provided for @errorLoadingProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading profile.'**
+  String get errorLoadingProfile;
+
+  /// No description provided for @chatWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with {name}'**
+  String chatWith(String name);
+
+  /// No description provided for @client.
+  ///
+  /// In en, this message translates to:
+  /// **'Client'**
+  String get client;
+
+  /// No description provided for @errorPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: '**
+  String get errorPrefix;
+
+  /// No description provided for @providerProfileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider profile not found.'**
+  String get providerProfileNotFound;
+
+  /// No description provided for @noNewJobRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No new job requests.'**
+  String get noNewJobRequests;
+
+  /// No description provided for @thankYouForPaymentAndFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your payment and feedback!'**
+  String get thankYouForPaymentAndFeedback;
+
+  /// No description provided for @failedToSubmitReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit review: '**
+  String get failedToSubmitReview;
+
+  /// No description provided for @failedToFinishJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to finish job: '**
+  String get failedToFinishJob;
+
+  /// No description provided for @markAsFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Finished'**
+  String get markAsFinished;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @noAppointmentsForThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No appointments for this day.'**
+  String get noAppointmentsForThisDay;
+
+  /// No description provided for @rewardsScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards Screen'**
+  String get rewardsScreen;
+
+  /// No description provided for @notLoggedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Not logged in.'**
+  String get notLoggedIn;
+
+  /// No description provided for @profileUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully!'**
+  String get profileUpdatedSuccessfully;
+
+  /// No description provided for @failedToUpdateProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile: '**
+  String get failedToUpdateProfile;
+
+  /// No description provided for @userNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'User not found.'**
+  String get userNotFound;
+
+  /// No description provided for @welcomeYouAreLoggedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome! You are logged in.'**
+  String get welcomeYouAreLoggedIn;
+
+  /// No description provided for @errorSavingPrices.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving prices: '**
+  String get errorSavingPrices;
+
+  /// No description provided for @setYourPrices.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Your Prices'**
+  String get setYourPrices;
+
+  /// No description provided for @saveAndFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and Finish'**
+  String get saveAndFinish;
+
+  /// No description provided for @failedToSendBookingRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send booking request: '**
+  String get failedToSendBookingRequest;
+
+  /// No description provided for @pleaseEnter6DigitCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a 6-digit code.'**
+  String get pleaseEnter6DigitCode;
+
+  /// No description provided for @roleSelectionScreenPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Role Selection Screen - Placeholder'**
+  String get roleSelectionScreenPlaceholder;
+
+  /// No description provided for @pleaseUploadIdPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Please upload your ID photo.'**
+  String get pleaseUploadIdPhoto;
+
+  /// No description provided for @pleaseEnterPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a phone number.'**
+  String get pleaseEnterPhoneNumber;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @noDescriptionProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No description provided.'**
+  String get noDescriptionProvided;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get resendCode;
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get price;
+
+  /// No description provided for @monthlyBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Breakdown'**
+  String get monthlyBreakdown;
+
+  /// No description provided for @noEarningsData.
+  ///
+  /// In en, this message translates to:
+  /// **'No earnings data available for this month.'**
+  String get noEarningsData;
+
+  /// No description provided for @youHaveNoActiveChats.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no active chats.'**
+  String get youHaveNoActiveChats;
+
+  /// No description provided for @enterYourPhoneNumberToReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your phone number to reset your PIN'**
+  String get enterYourPhoneNumberToReset;
+
+  /// No description provided for @sendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'SEND OTP'**
+  String get sendOtp;
 }
 
 class _AppLocalizationsDelegate

@@ -143,7 +143,7 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${widget.job.clientId?.firstName ?? 'Client'}'),
+        title: Text(l10n.chatWith(widget.job.clientId?.firstName ?? l10n.client)),
         actions: [
           if (isActionable)
             Row(

@@ -59,13 +59,15 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
       ref.refresh(providerScheduleProvider);
     } catch (e) {
       log('Error finishing job: $e');
+       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to finish job: $e')),
+        SnackBar(content: Text('${l10n.failedToFinishJob}$e')),
       );
     }
   }
 
   void _showJobDetailsDialog(Job job) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) {
@@ -73,7 +75,7 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(job.serviceName, style: const TextStyle(fontWeight: FontWeight.bold)),
-          content: Text("Status: ${job.status.toUpperCase()}\n\nDescription:\n${job.description ?? 'No description provided.'}"),
+          content: Text("${l10n.status}: ${job.status.toUpperCase()}\n\n${l10n.description}:\n${job.description ?? l10n.noDescriptionProvided}"),
           actions: [
             if (job.status == 'ACCEPTED' || job.status == 'ACTIVE')
               TextButton(
@@ -81,11 +83,11 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
                   Navigator.of(context).pop();
                   _finishJob(job.id);
                 },
-                child: const Text('Mark as Finished', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                child: Text(l10n.markAsFinished, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close', style: TextStyle(color: Colors.grey)),
+              child: Text(l10n.close, style: const TextStyle(color: Colors.grey)),
             ),
           ],
         );
@@ -102,7 +104,7 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
       backgroundColor: Colors.grey.shade50,
       body: scheduleAsyncValue.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(child: Text('${l10n.errorPrefix}$err')),
         data: (jobs) {
           final events = LinkedHashMap<DateTime, List<Job>>(
             equals: isSameDay,
@@ -171,7 +173,7 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
                       child: Center(
                         child: Padding(
                           padding: const EdgeInsets.all(48.0),
-                          child: Text('No appointments for this day.', style: TextStyle(color: Colors.grey.shade600)),
+                          child: Text(l10n.noAppointmentsForThisDay, style: TextStyle(color: Colors.grey.shade600)),
                         ),
                       ),
                     );

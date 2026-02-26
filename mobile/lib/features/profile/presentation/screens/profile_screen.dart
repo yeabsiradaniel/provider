@@ -33,7 +33,7 @@ class ProfileScreen extends ConsumerWidget {
       body: userAsyncValue.when(
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('Not logged in.'));
+            return Center(child: Text(l10n.notLoggedIn));
           }
           return CustomScrollView(
             slivers: [
@@ -125,7 +125,7 @@ class ProfileScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => const Center(child: Text('Error loading profile.')),
+        error: (err, stack) => Center(child: Text(l10n.errorLoadingProfile)),
       ),
     );
   }
