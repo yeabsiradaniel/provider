@@ -27,9 +27,9 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final userAsyncValue = ref.watch(userProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: userAsyncValue.when(
         data: (user) {
           if (user == null) {
@@ -38,17 +38,7 @@ class ProfileScreen extends ConsumerWidget {
           return CustomScrollView(
             slivers: [
               SliverAppBar(
-                floating: true,
-                pinned: true,
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                elevation: 0,
-                title: Text(
-                  l10n.profile,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                title: Text(l10n.profile),
               ),
               SliverToBoxAdapter(
                 child: Column(
@@ -61,24 +51,21 @@ class ProfileScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     Text(
                       '${user.firstName} ${user.lastName}',
-                      style: const TextStyle(
-                        fontSize: 22,
+                      style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
                       ),
                     ),
+                     const SizedBox(height: 4),
                     Text(
                       user.role.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.2,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.secondary,
                       ),
                     ),
                     const SizedBox(height: 40),
                     _buildProfileMenuItem(
                       context,
+                      theme,
                       icon: Icons.person_outline,
                       text: l10n.editProfile,
                       onTap: () async {
@@ -91,6 +78,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     _buildProfileMenuItem(
                       context,
+                      theme,
                       icon: Icons.settings_outlined,
                       text: l10n.settings,
                       onTap: () {
@@ -103,6 +91,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     _buildProfileMenuItem(
                       context,
+                      theme,
                       icon: Icons.payment_outlined,
                       text: l10n.paymentMethods,
                       onTap: () {
@@ -111,8 +100,10 @@ class ProfileScreen extends ConsumerWidget {
                         );
                       },
                     ),
+                     const SizedBox(height: 24),
                     _buildProfileMenuItem(
                       context,
+                      theme,
                       icon: Icons.logout_outlined,
                       text: l10n.logout,
                       isDestructive: true,
@@ -131,35 +122,28 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildProfileMenuItem(
-    BuildContext context, {
+    BuildContext context,
+    ThemeData theme, {
     required IconData icon,
     required String text,
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
+    final color = isDestructive ? theme.colorScheme.error : theme.colorScheme.onSurface;
+
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.shade100),
-          ),
+           color: theme.colorScheme.surface,
+           borderRadius: BorderRadius.circular(12),
+           border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: isDestructive ? Colors.red.withOpacity(0.05) : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: isDestructive ? Colors.red : Colors.black,
-              ),
-            ),
+            Icon(icon, size: 22, color: color),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -167,14 +151,14 @@ class ProfileScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDestructive ? Colors.red : Colors.black,
+                  color: color,
                 ),
               ),
             ),
             Icon(
               Icons.chevron_right,
               size: 18,
-              color: Colors.grey.shade400,
+              color: theme.colorScheme.secondary,
             ),
           ],
         ),

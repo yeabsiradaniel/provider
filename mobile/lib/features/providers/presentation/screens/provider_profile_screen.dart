@@ -67,17 +67,17 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   }
 
   Future<void> _selectDateRange(BuildContext context) async {
+    final theme = Theme.of(context);
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.black, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              onPrimary: theme.colorScheme.onPrimary, 
+              surface: theme.colorScheme.surface,
             ),
           ),
           child: child!,
@@ -95,6 +95,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).languageCode;
+    final theme = Theme.of(context);
     
     final profilePhotoUrl = _provider?.user.profilePhoto;
     final fullImageUrl = (profilePhotoUrl != null && profilePhotoUrl.isNotEmpty)
@@ -109,7 +110,6 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
 
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
@@ -118,8 +118,8 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                   expandedHeight: 250,
                   pinned: true,
                   floating: false,
-                  backgroundColor: Colors.black,
-                  iconTheme: const IconThemeData(color: Colors.white),
+                  backgroundColor: theme.colorScheme.primary,
+                  iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
                   flexibleSpace: FlexibleSpaceBar(
                     background: fullImageUrl != null 
                         ? Image.network(
@@ -128,7 +128,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                             color: Colors.black.withOpacity(0.4),
                             colorBlendMode: BlendMode.darken,
                           )
-                        : Container(color: Colors.grey.shade200),
+                        : Container(color: theme.colorScheme.tertiary),
                   ),
                   actions: [
                     IconButton(
@@ -145,29 +145,23 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                       children: [
                         Text(
                           providerName,
-                          style: const TextStyle(
-                            fontSize: 28,
+                          style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 4),
                          Text(
                           providerRole,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.w500,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: theme.colorScheme.secondary,
                           ),
                         ),
                         const SizedBox(height: 24),
                         const Divider(),
                         const SizedBox(height: 24),
-
-                        // Service Selection
                         Text(
                           l10n.services,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: theme.textTheme.titleLarge,
                         ),
                         const SizedBox(height: 12),
                         if (_provider != null && _provider!.serviceCategories.isNotEmpty)
@@ -184,24 +178,12 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                                 _selectedServiceId = value;
                               });
                             },
-                             decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey.shade300),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey.shade300),
-                              )
-                            ),
                           ),
 
                         const SizedBox(height: 24),
-                        // Issue Description
                         Text(
                           l10n.describeYourIssue,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: theme.textTheme.titleLarge,
                         ),
                         const SizedBox(height: 12),
                         TextField(
@@ -209,32 +191,23 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                           maxLines: 4,
                           decoration: InputDecoration(
                             hintText: l10n.enterDetailedDescription,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
-                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
 
-                        // Date Range Selection
                         Text(
                           l10n.preferredDates,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: theme.textTheme.titleLarge,
                         ),
                         const SizedBox(height: 12),
                         OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.black,
+                            foregroundColor: theme.colorScheme.onSurface,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            side: BorderSide(color: Colors.grey.shade300)
+                            side: BorderSide(color: theme.colorScheme.tertiary)
                           ),
                           onPressed: () => _selectDateRange(context),
                           icon: const Icon(Icons.calendar_today, size: 20),
@@ -251,19 +224,10 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade200))
+          color: theme.colorScheme.surface,
+          border: Border(top: BorderSide(color: theme.colorScheme.tertiary.withOpacity(0.5)))
         ),
         child: ElevatedButton(
-           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 0,
-            ),
           onPressed: () {
             if (_provider != null &&
                 _descriptionController.text.isNotEmpty &&
@@ -301,7 +265,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
               );
             }
           },
-          child: Text(l10n.bookNow, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          child: Text(l10n.bookNow),
         ),
       ),
     );

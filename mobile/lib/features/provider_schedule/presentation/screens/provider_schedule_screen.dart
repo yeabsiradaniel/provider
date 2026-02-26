@@ -68,11 +68,12 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
 
   void _showJobDetailsDialog(Job job) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.colorScheme.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(job.serviceName, style: const TextStyle(fontWeight: FontWeight.bold)),
           content: Text("${l10n.status}: ${job.status.toUpperCase()}\n\n${l10n.description}:\n${job.description ?? l10n.noDescriptionProvided}"),
@@ -83,11 +84,11 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
                   Navigator.of(context).pop();
                   _finishJob(job.id);
                 },
-                child: Text(l10n.markAsFinished, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                child: Text(l10n.markAsFinished, style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
               ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.close, style: const TextStyle(color: Colors.grey)),
+              child: Text(l10n.close, style: TextStyle(color: theme.colorScheme.secondary)),
             ),
           ],
         );
@@ -99,9 +100,9 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheduleAsyncValue = ref.watch(providerScheduleProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
       body: scheduleAsyncValue.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('${l10n.errorPrefix}$err')),
@@ -124,17 +125,11 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
           return CustomScrollView(
             slivers: [
               SliverAppBar(
-                backgroundColor: Colors.white,
-                pinned: true,
-                elevation: 0.5,
-                title: Text(
-                  l10n.schedule,
-                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                ),
+                title: Text(l10n.schedule),
               ),
               SliverToBoxAdapter(
                 child: Container(
-                  color: Colors.white,
+                  color: theme.colorScheme.surface,
                   child: TableCalendar<Job>(
                     firstDay: DateTime.utc(2020, 1, 1),
                     lastDay: DateTime.utc(2030, 12, 31),
@@ -148,16 +143,19 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
                       titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     calendarStyle: CalendarStyle(
+                      defaultTextStyle: TextStyle(color: theme.colorScheme.onSurface),
+                      weekendTextStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                      outsideTextStyle: TextStyle(color: theme.colorScheme.secondary.withOpacity(0.5)),
                       todayDecoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: theme.colorScheme.tertiary.withOpacity(0.5),
                         shape: BoxShape.circle,
                       ),
-                      selectedDecoration: const BoxDecoration(
-                        color: Colors.black,
+                      selectedDecoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
-                       markerDecoration: const BoxDecoration(
-                        color: Colors.black,
+                       markerDecoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -173,7 +171,7 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
                       child: Center(
                         child: Padding(
                           padding: const EdgeInsets.all(48.0),
-                          child: Text(l10n.noAppointmentsForThisDay, style: TextStyle(color: Colors.grey.shade600)),
+                          child: Text(l10n.noAppointmentsForThisDay, style: TextStyle(color: theme.colorScheme.secondary)),
                         ),
                       ),
                     );
@@ -184,7 +182,7 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final job = value[index];
-                           return _buildEventItem(job);
+                           return _buildEventItem(job, theme);
                         },
                         childCount: value.length,
                       ),
@@ -199,20 +197,20 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
     );
   }
 
-  Widget _buildEventItem(Job job) {
+  Widget _buildEventItem(Job job, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
       ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Colors.grey.shade100,
+          backgroundColor: theme.scaffoldBackgroundColor,
           child: Text(
             '${job.clientId?.firstName.substring(0, 1) ?? '?'}${job.clientId?.lastName.substring(0, 1) ?? ''}',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+            style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
           ),
         ),
         title: Text(job.serviceName, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -222,8 +220,8 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
               ? Icons.check_circle
               : Icons.chevron_right,
           color: job.status == 'COMPLETED'
-              ? Colors.black
-              : Colors.grey.shade400,
+              ? theme.colorScheme.primary
+              : theme.colorScheme.tertiary,
         ),
         onTap: () => _showJobDetailsDialog(job),
       ),

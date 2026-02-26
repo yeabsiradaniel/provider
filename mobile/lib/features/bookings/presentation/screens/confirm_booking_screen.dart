@@ -48,6 +48,7 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final String providerName = widget.jobDetails['providerName'] ?? 'N/A';
     final String serviceName = widget.jobDetails['serviceName'] ?? 'N/A';
     final String description = widget.jobDetails['description'] ?? 'N/A';
@@ -56,21 +57,11 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
     final String profilePhoto = widget.jobDetails['profilePhoto'] ?? '';
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            elevation: 0,
             pinned: true,
-            iconTheme: const IconThemeData(color: Colors.black),
-            title: Text(
-              l10n.confirmBooking,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            title: Text(l10n.confirmBooking),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -78,18 +69,16 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.summary, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  Text(l10n.summary, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 24),
-
-                  // Provider Info
-                  _buildSectionHeader(l10n.provider),
+                  _buildSectionHeader(l10n.provider, theme),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200)
+                      border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5))
                     ),
                     child: Row(
                       children: [
@@ -102,22 +91,18 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Service Details
-                  _buildSectionHeader(l10n.services),
+                  _buildSectionHeader(l10n.services, theme),
                   const SizedBox(height: 12),
-                  _buildInfoRow(icon: Icons.work_outline, text: serviceName),
+                  _buildInfoRow(icon: Icons.work_outline, text: serviceName, theme: theme),
                   const SizedBox(height: 8),
                    Padding(
-                     padding: const EdgeInsets.only(left: 36.0), // Align with icon
-                     child: Text(description, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                     padding: const EdgeInsets.only(left: 36.0),
+                     child: Text(description, style: TextStyle(color: theme.colorScheme.secondary, fontSize: 14)),
                    ),
                   const SizedBox(height: 24),
-
-                  // Date & Time
-                  _buildSectionHeader(l10n.dates),
+                  _buildSectionHeader(l10n.dates, theme),
                   const SizedBox(height: 12),
-                  _buildInfoRow(icon: Icons.calendar_today_outlined, text: '$startDate to $endDate'),
+                  _buildInfoRow(icon: Icons.calendar_today_outlined, text: '$startDate to $endDate', theme: theme),
                 ],
               ),
             ),
@@ -127,8 +112,8 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade200))
+          color: theme.colorScheme.surface,
+          border: Border(top: BorderSide(color: theme.colorScheme.tertiary.withOpacity(0.5)))
         ),
         child: Row(
           children: [
@@ -138,29 +123,22 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  side: BorderSide(color: Colors.grey.shade300)
+                  side: BorderSide(color: theme.colorScheme.tertiary)
                 ),
-                child: Text(l10n.cancel, style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
+                child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.secondary, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton(
                 onPressed: _isBooking ? null : _confirmBooking,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
                 child: _isBooking
                     ? const SizedBox(
                         height: 24,
                         width: 24,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                        child: CircularProgressIndicator(strokeWidth: 3),
                       )
-                    : Text(l10n.confirmBooking, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    : Text(l10n.confirmBooking),
               ),
             ),
           ],
@@ -169,22 +147,17 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
     );
   }
   
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, ThemeData theme) {
     return Text(
-      title,
-      style: TextStyle(
-        color: Colors.grey.shade500,
-        fontWeight: FontWeight.bold,
-        fontSize: 12,
-        letterSpacing: 0.8,
-      ),
+      title.toUpperCase(),
+      style: theme.textTheme.labelSmall,
     );
   }
 
-  Widget _buildInfoRow({required IconData icon, required String text}) {
+  Widget _buildInfoRow({required IconData icon, required String text, required ThemeData theme}) {
     return Row(
       children: [
-        Icon(icon, color: Colors.black, size: 20),
+        Icon(icon, color: theme.colorScheme.onSurface, size: 20),
         const SizedBox(width: 16),
         Expanded(
           child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/core/widgets/profile_avatar.dart';
+import 'package:mobile/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:mobile/features/user/domain/models/user.dart';
 import 'package:mobile/features/user/domain/providers/user_provider.dart';
 import 'package:mobile/features/user/domain/services/user_service.dart';
@@ -109,6 +110,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(userProvider).value;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -121,66 +123,75 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (_profileImage != null)
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage: FileImage(_profileImage!),
-                      )
-                    else
-                      ProfileAvatar(
-                        imageUrl: user.profilePhoto ?? '',
-                        radius: 60,
+                    Center(
+                      child: Stack(
+                        children: [
+                          if (_profileImage != null)
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: FileImage(_profileImage!),
+                            )
+                          else
+                            ProfileAvatar(
+                              imageUrl: user.profilePhoto ?? '',
+                              radius: 50,
+                            ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: _pickImage,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.edit,
+                                    color: theme.colorScheme.onPrimary, size: 16),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: _pickImage,
-                      child: Text(l10n.changeProfilePhoto),
                     ),
-                    const SizedBox(height: 32),
-                    TextFormField(
+                    const SizedBox(height: 48),
+                    CustomTextField(
+                      label: l10n.firstName,
                       controller: _firstNameController,
-                      decoration: InputDecoration(labelText: l10n.firstName),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.fieldRequired;
-                        }
-                        return null;
-                      },
+                      hintText: l10n.enterYourFirstName,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextField(
+                      label: l10n.lastName,
                       controller: _lastNameController,
-                      decoration: InputDecoration(labelText: l10n.lastName),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.fieldRequired;
-                        }
-                        return null;
-                      },
+                      hintText: l10n.enterYourLastName,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextField(
+                      label: l10n.phone,
                       controller: _phoneController,
-                      decoration: InputDecoration(labelText: l10n.phone),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.fieldRequired;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _updateProfile,
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(l10n.updateProfile),
+                      isNumeric: true,
                     ),
                   ],
                 ),
               ),
             ),
+       bottomNavigationBar: Padding(
+         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+         child: ElevatedButton(
+            onPressed: _isLoading ? null : _updateProfile,
+            child: _isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 3),
+                  )
+                : Text(l10n.updateProfile),
+          ),
+       ),
     );
   }
 }

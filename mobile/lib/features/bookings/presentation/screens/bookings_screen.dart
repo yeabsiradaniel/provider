@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/features/bookings/domain/models/job.dart';
 import 'package:mobile/features/bookings/domain/providers/booking_provider.dart';
-import 'package:mobile/features/review/presentation/screens/rating_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 class BookingsScreen extends ConsumerWidget {
@@ -13,9 +12,9 @@ class BookingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final bookingsAsyncValue = ref.watch(customerBookingsProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: bookingsAsyncValue.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('${l10n.errorPrefix}$err')),
@@ -27,28 +26,20 @@ class BookingsScreen extends ConsumerWidget {
                 SliverAppBar(
                   floating: true,
                   pinned: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  elevation: 0,
-                  title: Text(
-                    l10n.bookings,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  title: Text(l10n.bookings),
                 ),
                 if (jobs.isEmpty)
                   SliverFillRemaining(
                     child: Center(
                       child: Text(
                         l10n.bookingWillAppearHere,
-                        style: TextStyle(color: Colors.grey.shade600),
+                        style: TextStyle(color: theme.colorScheme.secondary),
                       ),
                     ),
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -69,6 +60,7 @@ class BookingsScreen extends ConsumerWidget {
 
   Widget _buildBookingItem(BuildContext context, Job job, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     
     final providerName = (job.providerId != null) 
         ? '${job.providerId!.firstName} ${job.providerId!.lastName}'
@@ -76,104 +68,107 @@ class BookingsScreen extends ConsumerWidget {
     
     Color statusColor;
     String statusText;
+    bool isPrimaryStatus;
+
     switch (job.status) {
       case 'COMPLETED':
-        statusColor = Colors.black;
+        statusColor = theme.colorScheme.primary;
         statusText = l10n.completed;
+        isPrimaryStatus = true;
         break;
       case 'CANCELLED':
-        statusColor = Colors.grey.shade600;
+        statusColor = theme.colorScheme.tertiary;
         statusText = l10n.cancelled;
+        isPrimaryStatus = false;
         break;
       case 'ACCEPTED':
-         statusColor = Colors.black;
+         statusColor = theme.colorScheme.primary;
          statusText = l10n.upcoming;
+         isPrimaryStatus = true;
          break;
       default:
-        statusColor = Colors.black;
+        statusColor = theme.colorScheme.secondary;
         statusText = l10n.upcoming;
+        isPrimaryStatus = false;
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
       ),
-      child: Column(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.assignment_outlined,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  job.serviceName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.assignment_outlined,
-                  color: Colors.black,
+                const SizedBox(height: 4),
+                Text(
+                  providerName,
+                  style: TextStyle(
+                    color: theme.colorScheme.secondary,
+                    fontSize: 14,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 8),
+                Row(
                   children: [
+                    Icon(Icons.calendar_today, size: 12, color: theme.colorScheme.secondary),
+                    const SizedBox(width: 4),
                     Text(
-                      job.serviceName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      providerName,
+                      DateFormat.yMMMd().format(job.createdAt),
                       style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
+                        color: theme.colorScheme.secondary,
+                        fontSize: 12,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.calendar_today, size: 12, color: Colors.grey.shade500),
-                        const SizedBox(width: 4),
-                        Text(
-                          DateFormat.yMMMd().format(job.createdAt),
-                          style: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isPrimaryStatus ? statusColor : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+              border: isPrimaryStatus ? null : Border.all(color: statusColor),
+            ),
+            child: Text(
+              statusText.toUpperCase(),
+              style: TextStyle(
+                color: isPrimaryStatus ? theme.colorScheme.onPrimary : statusColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+                letterSpacing: 0.5,
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor == Colors.black ? Colors.black : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  statusText.toUpperCase(),
-                  style: TextStyle(
-                    color: statusColor == Colors.black ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),

@@ -61,35 +61,28 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final themeMode = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.white,
-            pinned: true,
-            elevation: 0.5,
-            iconTheme: const IconThemeData(color: Colors.black),
-            title: Text(
-              l10n.settings,
-              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            ),
+            title: Text(l10n.settings),
           ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
               child: Column(
                 children: [
-                   _buildSectionHeader('General'),
+                   _buildSectionHeader('General', theme),
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
                     ),
                     child: Column(
                       children: [
@@ -98,7 +91,7 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
                           value: themeMode == ThemeMode.dark,
                           onChanged: _updateDarkMode,
                         ),
-                        _buildDivider(),
+                        _buildDivider(theme),
                         _buildSettingsRow(
                           title: l10n.enableNotifications,
                           value: _notificationsEnabled,
@@ -108,13 +101,13 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
                     ),
                   ),
                   const SizedBox(height: 24),
-                   _buildSectionHeader('Language'),
+                   _buildSectionHeader('Language', theme),
                    const SizedBox(height: 8),
                     Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
-                       border: Border.all(color: Colors.grey.shade200),
+                       border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
                     ),
                     child: Column(
                       children: [
@@ -125,7 +118,7 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
                             await _updateLanguage('en');
                           },
                         ),
-                         _buildDivider(),
+                         _buildDivider(theme),
                          _buildLanguageRow(
                           language: 'አማርኛ',
                           isSelected: locale.languageCode == 'am',
@@ -151,28 +144,23 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
     ref.read(localeProvider.notifier).state = Locale(newLang);
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, ThemeData theme) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
         child: Text(
           title.toUpperCase(),
-           style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade500,
-              letterSpacing: 0.8,
-            ),
+           style: theme.textTheme.labelSmall,
         ),
       ),
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0),
-      child: Divider(height: 1, color: Colors.grey.shade200),
+      child: Divider(height: 1, color: theme.colorScheme.tertiary.withOpacity(0.5)),
     );
   }
 
@@ -187,10 +175,6 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: Colors.white,
-        activeTrackColor: Colors.black,
-        inactiveThumbColor: Colors.white,
-        inactiveTrackColor: Colors.grey.shade300,
       ),
     );
   }
@@ -200,6 +184,7 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return ListTile(
        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       title: Text(language, style: const TextStyle(fontWeight: FontWeight.w500)),
@@ -207,11 +192,11 @@ class _ProviderSettingsScreenState extends ConsumerState<ProviderSettingsScreen>
           ? Container(
               width: 24,
               height: 24,
-              decoration: const BoxDecoration(
-                color: Colors.black,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.check, color: Colors.white, size: 16),
+              child: Icon(Icons.check, color: theme.colorScheme.onPrimary, size: 16),
             )
           : null,
       onTap: onTap,

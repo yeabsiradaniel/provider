@@ -87,15 +87,10 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          l10n.rateAndPay,
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        title: Text(l10n.rateAndPay),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -109,8 +104,7 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
               Text(
                 l10n.howWasYourService,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 24,
+                style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -123,7 +117,7 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
                   itemCount: 5,
                   itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
                   itemBuilder: (context, _) =>
-                      const Icon(Icons.star, color: Colors.black),
+                      Icon(Icons.star, color: theme.colorScheme.primary),
                   onRatingUpdate: (rating) {
                     setState(() {
                       _rating = rating;
@@ -134,12 +128,7 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
               const SizedBox(height: 48),
               Text(
                 l10n.amountPaid.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade600,
-                  letterSpacing: 0.8,
-                ),
+                style: theme.textTheme.labelSmall,
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -151,20 +140,6 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
                 decoration: InputDecoration(
                   hintText: '0.00',
                   prefixText: 'ETB ',
-                  prefixStyle: const TextStyle(color: Colors.black),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.black, width: 1.5),
-                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -183,24 +158,14 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 0,
-          ),
           onPressed: _isSubmitting ? null : _submitReviewAndPayment,
           child: _isSubmitting
               ? const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                  child: CircularProgressIndicator(strokeWidth: 3),
                 )
-              : Text(
-                  l10n.submitPaymentAndReview,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
+              : Text(l10n.submitPaymentAndReview),
         ),
       ),
     );

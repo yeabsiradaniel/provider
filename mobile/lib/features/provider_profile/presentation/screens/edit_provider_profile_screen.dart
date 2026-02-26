@@ -111,6 +111,7 @@ class _EditProviderProfileScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(userProvider).value;
+     final theme = Theme.of(context);
 
     if (user == null) {
       return Scaffold(
@@ -121,12 +122,8 @@ class _EditProviderProfileScreenState
     final providerProfile = ref.watch(providerProfileProvider(user.id)).value;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(l10n.editProfile, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-         backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text(l10n.editProfile),
       ),
       body: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
@@ -155,11 +152,11 @@ class _EditProviderProfileScreenState
                               onTap: _pickImage,
                               child: Container(
                                 padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
-                                  color: Colors.black,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary,
                                   shape: BoxShape.circle
                                 ),
-                                child: const Icon(Icons.edit, color: Colors.white, size: 16),
+                                child: Icon(Icons.edit, color: theme.colorScheme.onPrimary, size: 16),
                               ),
                             ),
                           )
@@ -189,7 +186,7 @@ class _EditProviderProfileScreenState
                      const SizedBox(height: 16),
                     ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.miscellaneous_services_outlined, color: Colors.black),
+                      leading: Icon(Icons.miscellaneous_services_outlined, color: theme.colorScheme.onSurface),
                       title: Text(l10n.services, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
                       trailing: const Icon(Icons.chevron_right),
                       enabled: providerProfile != null,
@@ -214,24 +211,14 @@ class _EditProviderProfileScreenState
        bottomNavigationBar: Padding(
          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 0,
-            ),
             onPressed: _isLoading ? null : _updateProfile,
             child: _isLoading
                 ? const SizedBox(
                     width: 24,
                     height: 24,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                    child: CircularProgressIndicator(strokeWidth: 3),
                   )
-                : Text(
-                    l10n.updateProfile,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
+                : Text(l10n.updateProfile),
           ),
        ),
     );

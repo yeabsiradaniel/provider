@@ -1,111 +1,144 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/theme/app_colors.dart';
 import 'package:mobile/core/theme/radius.dart';
 
 class AppTheme {
-  // Private constructor
   AppTheme._();
 
-  static final ThemeData lightTheme = ThemeData(
+  static final ThemeData lightTheme = _buildTheme(
     brightness: Brightness.light,
-    primaryColor: const Color(0xFF000000),
-    scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-    colorScheme: const ColorScheme.light(
-      primary: Color(0xFF000000),
-      secondary: Color(0xFF808080),
-      background: Color(0xFFFFFFFF),
-      surface: Color(0xFFFFFFFF),
-      onPrimary: Color(0xFFFFFFFF),
-      onSecondary: Color(0xFF000000),
-      onBackground: Color(0xFF000000),
-      onSurface: Color(0xFF000000),
-      tertiary: Color(0xFF808080), // for label-caps
-    ),
-    fontFamily: 'Plus Jakarta Sans',
-    textTheme: const TextTheme(
-      headlineLarge: TextStyle(
-        fontSize: 26.0,
-        fontWeight: FontWeight.w800,
-        letterSpacing: -0.02 * 26.0,
-        fontFamilyFallback: ['Noto Sans Ethiopic', 'sans-serif'],
-      ),
-      headlineMedium: TextStyle(
-        fontSize: 19.0,
-        fontWeight: FontWeight.w700,
-        fontFamilyFallback: ['Noto Sans Ethiopic', 'sans-serif'],
-      ),
-      labelSmall: TextStyle(
-        fontSize: 10.0,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 0.12 * 10.0,
-        color: Color(0xFF808080),
-        fontFamilyFallback: ['Noto Sans Ethiopic', 'sans-serif'],
-      ),
-    ),
-    cardTheme: const CardThemeData(
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.cardRadius,
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          const RoundedRectangleBorder(
-            borderRadius: AppRadius.buttonRadius,
-          ),
-        ),
-      ),
-    ),
+    scaffold: AppColors.background,
+    primary: AppColors.primary,
+    onPrimary: AppColors.primaryInverse,
+    secondary: AppColors.secondary,
+    surface: AppColors.surface,
+    onSurface: AppColors.primary,
+    tertiary: AppColors.tertiary,
   );
 
-  static final ThemeData darkTheme = ThemeData(
+  static final ThemeData darkTheme = _buildTheme(
     brightness: Brightness.dark,
-    primaryColor: const Color(0xFFFFFFFF),
-    scaffoldBackgroundColor: const Color(0xFF000000),
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xFFFFFFFF),
-      secondary: Color(0xFF808080),
-      background: Color(0xFF000000),
-      surface: Color(0xFF000000),
-      onPrimary: Color(0xFF000000),
-      onSecondary: Color(0xFFFFFFFF),
-      onBackground: Color(0xFFFFFFFF),
-      onSurface: Color(0xFFFFFFFF),
-      tertiary: Color(0xFF808080), // for label-caps
-    ),
-    fontFamily: 'Plus Jakarta Sans',
-    textTheme: const TextTheme(
-      headlineLarge: TextStyle(
-        fontSize: 26.0,
-        fontWeight: FontWeight.w800,
-        letterSpacing: -0.02 * 26.0,
-        fontFamilyFallback: ['Noto Sans Ethiopic', 'sans-serif'],
+    scaffold: AppColors.backgroundDark,
+    primary: AppColors.primaryInverse,
+    onPrimary: AppColors.primary,
+    secondary: AppColors.tertiary, // Lighter grey for dark mode secondary text
+    surface: AppColors.surfaceDark,
+    onSurface: AppColors.primaryInverse,
+    tertiary: AppColors.secondary, // Darker grey for dark mode tertiary
+  );
+
+  static ThemeData _buildTheme({
+    required Brightness brightness,
+    required Color scaffold,
+    required Color primary,
+    required Color onPrimary,
+    required Color secondary,
+    required Color surface,
+    required Color onSurface,
+    required Color tertiary,
+  }) {
+    return ThemeData(
+      brightness: brightness,
+      primaryColor: primary,
+      scaffoldBackgroundColor: scaffold,
+      fontFamily: 'Plus Jakarta Sans',
+      
+      colorScheme: ColorScheme(
+        brightness: brightness,
+        primary: primary,
+        onPrimary: onPrimary,
+        secondary: secondary,
+        onSecondary: onSurface,
+        error: AppColors.error,
+        onError: AppColors.primaryInverse,
+        background: scaffold,
+        onBackground: onSurface,
+        surface: surface,
+        onSurface: onSurface,
+        tertiary: tertiary,
       ),
-      headlineMedium: TextStyle(
-        fontSize: 19.0,
-        fontWeight: FontWeight.w700,
-        fontFamilyFallback: ['Noto Sans Ethiopic', 'sans-serif'],
+
+      appBarTheme: AppBarTheme(
+        backgroundColor: surface,
+        elevation: 0,
+        iconTheme: IconThemeData(color: onSurface),
+        titleTextStyle: TextStyle(
+          color: onSurface,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Plus Jakarta Sans',
+        ),
       ),
-      labelSmall: TextStyle(
-        fontSize: 10.0,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 0.12 * 10.0,
-        color: Color(0xFF808080),
-        fontFamilyFallback: ['Noto Sans Ethiopic', 'sans-serif'],
+
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: scaffold,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.textFieldRadius,
+          borderSide: BorderSide(color: tertiary),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.textFieldRadius,
+          borderSide: BorderSide(color: tertiary),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadius.textFieldRadius,
+          borderSide: BorderSide(color: primary, width: 1.5),
+        ),
+        labelStyle: TextStyle(color: secondary),
+        hintStyle: TextStyle(color: tertiary),
       ),
-    ),
-    cardTheme: const CardThemeData(
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.cardRadius,
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          const RoundedRectangleBorder(
+      
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primary,
+          foregroundColor: onPrimary,
+          disabledBackgroundColor: tertiary,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
             borderRadius: AppRadius.buttonRadius,
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Plus Jakarta Sans',
           ),
         ),
       ),
-    ),
-  );
+
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: primary,
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Plus Jakarta Sans',
+          )
+        )
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.all(AppColors.primaryInverse),
+        trackColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return primary;
+          }
+          return tertiary;
+        }),
+      ),
+
+      checkboxTheme: CheckboxThemeData(
+        fillColor: MaterialStateProperty.resolveWith((states) {
+           if (states.contains(MaterialState.selected)) {
+            return primary;
+          }
+          return null; // Defer to shape
+        }),
+        checkColor: MaterialStateProperty.all(onPrimary),
+        side: BorderSide(color: tertiary, width: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      )
+    );
+  }
 }

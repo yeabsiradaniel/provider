@@ -32,6 +32,8 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -61,12 +63,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey.shade600,
+        selectedItemColor: theme.colorScheme.primary,
+        unselectedItemColor: theme.colorScheme.secondary,
         onTap: _onItemTapped,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.colorScheme.surface,
         elevation: 8,
       ),
     );

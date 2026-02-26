@@ -88,10 +88,8 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
     };
     
     log('--- [LOG] ProviderChatScreen: Emitting sendMessage via socket. ---');
-    // Only send the message via the socket.
     ref.read(socketServiceProvider).sendMessage(messageData);
 
-    // Clear the input field immediately.
     _messageController.clear();
   }
 
@@ -138,6 +136,7 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentUser = ref.watch(userProvider).value;
+    final theme = Theme.of(context);
     final bool isActionable = widget.job.status == 'PENDING';
     final bool isProcessing = _isAccepting || _isDeclining;
 
@@ -151,13 +150,13 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
                 TextButton(
                   onPressed: isProcessing ? null : _declineRequest,
                   child: _isDeclining
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(l10n.decline, style: const TextStyle(color: Colors.red)),
+                      ? const CircularProgressIndicator()
+                      : Text(l10n.decline, style: TextStyle(color: theme.colorScheme.error)),
                 ),
                 TextButton(
                   onPressed: isProcessing ? null : _acceptRequest,
                   child: _isAccepting
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator()
                       : Text(l10n.accept),
                 ),
               ],
@@ -192,18 +191,19 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isMe ? Theme.of(context).colorScheme.primary : Colors.grey[300],
+          color: isMe ? theme.colorScheme.primary : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           text,
-          style: TextStyle(color: isMe ? Colors.white : Colors.black),
+          style: TextStyle(color: isMe ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface),
         ),
       ),
     );
@@ -218,22 +218,27 @@ class _MessageInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(top: BorderSide(color: theme.colorScheme.tertiary.withOpacity(0.5))),
+      ),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'Type a message...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.typeMessage,
               ),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.send),
             onPressed: onSend,
+            color: theme.colorScheme.primary,
           ),
         ],
       ),

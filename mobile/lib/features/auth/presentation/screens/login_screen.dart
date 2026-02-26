@@ -45,8 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
       };
 
       try {
-        // NOTE: In a real login flow, this would call a login endpoint,
-        // not request OTP. Reusing for this project's structure.
         await _authService.requestOtp(phoneNumber);
         if (mounted) {
           Navigator.push(
@@ -83,8 +81,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -98,16 +96,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     l10n.welcomeBack,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.loginToYourAccount,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                    style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.secondary),
                   ),
                   const SizedBox(height: 32),
                   RoleToggleButton(
@@ -140,8 +135,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: Text(
                         l10n.forgotPin,
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
                         ),
@@ -169,14 +164,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: TextSpan(
                           text: l10n.dontHaveAccount,
                           style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color: theme.colorScheme.secondary,
                             fontSize: 14,
                           ),
                           children: [
                             TextSpan(
                               text: l10n.register,
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),

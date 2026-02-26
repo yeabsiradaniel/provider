@@ -7,8 +7,9 @@ class BookingSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32.0),
@@ -21,11 +22,12 @@ class BookingSuccessScreen extends StatelessWidget {
                 height: 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey.shade100,
+                  color: theme.colorScheme.surface,
+                  border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5))
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_rounded,
-                  color: Colors.black,
+                  color: theme.colorScheme.primary,
                   size: 80,
                 ),
               ),
@@ -33,44 +35,25 @@ class BookingSuccessScreen extends StatelessWidget {
               Text(
                 l10n.requestSent,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 28,
+                style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
                 l10n.providerNotified,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey.shade600,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
                   height: 1.5,
                 ),
               ),
               const Spacer(flex: 3),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
                 onPressed: () {
-                  // Navigate to the root (home screen)
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
-                child: Text(
-                  l10n.backToHome,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: Text(l10n.backToHome),
               ),
             ],
           ),

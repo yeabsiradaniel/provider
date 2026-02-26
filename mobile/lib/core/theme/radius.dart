@@ -16,4 +16,6 @@ class AppRadius {
     bottomLeft: Radius.circular(18.0),
     bottomRight: Radius.circular(18.0),
   );
+
+  static final BorderRadius textFieldRadius = BorderRadius.circular(12.0);
 }

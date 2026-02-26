@@ -3,13 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mobile/core/widgets/profile_avatar.dart';
 import 'package:mobile/features/bookings/presentation/screens/bookings_screen.dart';
 import 'package:mobile/features/categories/domain/models/category.dart';
 import 'package:mobile/features/categories/domain/services/category_service.dart';
 import 'package:mobile/features/categories/presentation/screens/sub_category_screen.dart';
 import 'package:mobile/features/chat/presentation/screens/chat_list_screen.dart';
-import 'package:mobile/features/client_dashboard/presentation/widgets/discount_card.dart';
 import 'package:mobile/features/location/domain/providers/location_provider.dart';
 import 'package:mobile/features/location/domain/services/location_service.dart';
 import 'package:mobile/features/profile/presentation/screens/profile_screen.dart';
@@ -45,33 +43,40 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
             label: l10n.home,
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.list_alt),
+            icon: const Icon(Icons.list_alt_outlined),
+            activeIcon: const Icon(Icons.list_alt),
             label: l10n.bookings,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.chat_bubble_outline),
+             activeIcon: const Icon(Icons.chat_bubble),
             label: l10n.chat,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.person_outline),
+            activeIcon: const Icon(Icons.person),
             label: l10n.profile,
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: theme.colorScheme.primary,
+        unselectedItemColor: theme.colorScheme.secondary,
         onTap: _onItemTapped,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 8,
       ),
     );
   }
@@ -91,7 +96,6 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
 
   List<Category> _categories = [];
   bool _isLoadingCategories = true;
-  bool _showAllCategories = false;
 
   final TextEditingController _searchController = TextEditingController();
   List<SearchResult> _searchResults = [];
@@ -183,9 +187,11 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
 
   void _handleSearchSelection(SearchResult result) {
     _searchController.clear();
-    setState(() {
-      _searchResults.clear();
-    });
+    if(mounted) {
+      setState(() {
+        _searchResults.clear();
+      });
+    }
 
     if (result.type == 'provider') {
       Navigator.push(
@@ -213,9 +219,9 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
     final l10n = AppLocalizations.of(context)!;
     final userAsyncValue = ref.watch(userProvider);
     final currentPosition = ref.watch(currentPositionProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
         body: userAsyncValue.when(
           data: (user) {
             if (user == null) {
@@ -228,7 +234,6 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                   floating: true,
                   pinned: false,
                   snap: false,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   title: Row(
                     children: [
                       const Icon(Icons.location_on, size: 20),
@@ -237,7 +242,7 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                         currentPosition != null
                             ? '${currentPosition.latitude.toStringAsFixed(2)}, ${currentPosition.longitude.toStringAsFixed(2)}'
                             : l10n.boleAddisAbaba,
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface),
                       ),
                     ],
                   ),
@@ -258,19 +263,7 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                           onChanged: _onSearchChanged,
                           decoration: InputDecoration(
                             hintText: l10n.searchForServicesAndPackages,
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade300,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade300,
-                              ),
-                            ),
+                            prefixIcon: Icon(Icons.search, color: theme.colorScheme.onSurface),
                           ),
                         ),
                         if (_isSearching)
@@ -282,15 +275,9 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                           Container(
                             margin: const EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
+                              color: theme.cardColor,
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x08000000),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
+                              border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5))
                             ),
                             constraints: BoxConstraints(
                                 maxHeight:
@@ -302,7 +289,7 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                                 final result = _searchResults[index];
                                 return ListTile(
                                   title: Text(result.name),
-                                  subtitle: Text(result.type),
+                                  subtitle: Text(result.type, style: TextStyle(color: theme.colorScheme.secondary)),
                                   onTap: () => _handleSearchSelection(result),
                                 );
                               },
@@ -318,7 +305,8 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      color: Colors.grey.shade200,
+                      color: theme.colorScheme.surface,
+                      border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5))
                     ),
                     child: Row(
                       children: [
@@ -328,7 +316,7 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                             children: [
                               Text(l10n.cleaningServices,
                                   style:
-                                      TextStyle(color: Colors.grey.shade600)),
+                                      TextStyle(color: theme.colorScheme.secondary)),
                               const SizedBox(height: 8),
                               Text(l10n.qualityWorkAffordablePrice,
                                   style: const TextStyle(
@@ -337,16 +325,15 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                               const SizedBox(height: 8),
                               Text(l10n.weBringProfessionalCleaningServices,
                                   style:
-                                      TextStyle(color: Colors.grey.shade600)),
+                                      TextStyle(color: theme.colorScheme.secondary)),
                             ],
                           ),
                         ),
                         const SizedBox(width: 16),
-                        // You can replace this with an actual image
                         Container(
                           width: 100,
                           height: 100,
-                          color: Colors.grey,
+                          color: theme.colorScheme.tertiary,
                         )
                       ],
                     ),
@@ -368,9 +355,7 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               return _buildCategoryItem(
-                                  context, _categories[index],
-                                  bgColor: Colors.white,
-                                  iconColor: Colors.black);
+                                  context, _categories[index]);
                             },
                             childCount: _categories.length,
                           ),
@@ -385,57 +370,23 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
         ));
   }
 
-  Color _getCategoryBgColor(int index) {
-    final colors = [
-      const Color(0xFFE0EFFF),
-      const Color(0xFFD4FFEE),
-      const Color(0xFFFFF7ED),
-      const Color(0xFFFFF1F2),
-    ];
-    return colors[index % colors.length];
-  }
-
-  Color _getCategoryIconColor(int index) {
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.red,
-    ];
-    return colors[index % colors.length];
-  }
-
-  Widget _buildCategoryItem(
-      BuildContext context, Category category,
-      {required Color bgColor, required Color iconColor}) {
+  Widget _buildCategoryItem(BuildContext context, Category category) {
+     final theme = Theme.of(context);
     IconData getIconData(String? iconName) {
       switch (iconName) {
-        case 'plumbing':
-          return Icons.plumbing;
-        case 'bolt':
-          return Icons.bolt;
-        case 'cleaning_services':
-          return Icons.cleaning_services;
-        case 'home_repair_service':
-          return Icons.home_repair_service;
-        case 'devices':
-          return Icons.devices;
-        case 'format_paint':
-          return Icons.format_paint;
-        case 'architecture':
-          return Icons.architecture;
-        case 'satellite_alt':
-          return Icons.satellite_alt;
-        case 'construction':
-          return Icons.construction;
-        case 'electrical_services':
-          return Icons.electrical_services;
-        case 'power':
-          return Icons.power;
-        case 'roofing':
-          return Icons.roofing;
-        default:
-          return Icons.category;
+        case 'plumbing': return Icons.plumbing;
+        case 'bolt': return Icons.bolt;
+        case 'cleaning_services': return Icons.cleaning_services;
+        case 'home_repair_service': return Icons.home_repair_service;
+        case 'devices': return Icons.devices;
+        case 'format_paint': return Icons.format_paint;
+        case 'architecture': return Icons.architecture;
+        case 'satellite_alt': return Icons.satellite_alt;
+        case 'construction': return Icons.construction;
+        case 'electrical_services': return Icons.electrical_services;
+        case 'power': return Icons.power;
+        case 'roofing': return Icons.roofing;
+        default: return Icons.category;
       }
     }
 
@@ -454,12 +405,14 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5))
             ),
             child: Icon(
               getIconData(category.icon),
               size: 40,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -468,9 +421,10 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ],

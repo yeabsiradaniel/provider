@@ -101,8 +101,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -116,16 +116,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   Text(
                     l10n.welcome,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.createYourAccount,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                    style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.secondary),
                   ),
                   const SizedBox(height: 32),
                   RoleToggleButton(
@@ -159,14 +156,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         text: TextSpan(
                           text: l10n.alreadyHaveAccount,
                           style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color: theme.colorScheme.secondary,
                             fontSize: 14,
                           ),
                           children: [
                             TextSpan(
                               text: l10n.login,
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),

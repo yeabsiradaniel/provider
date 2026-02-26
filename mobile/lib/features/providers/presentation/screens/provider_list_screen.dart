@@ -5,7 +5,6 @@ import 'package:mobile/features/location/domain/services/location_service.dart';
 import 'package:mobile/features/providers/domain/models/provider.dart';
 import 'package:mobile/features/providers/domain/services/provider_service.dart';
 import 'package:mobile/features/providers/presentation/screens/provider_profile_screen.dart';
-import 'package:mobile/features/providers/presentation/widgets/provider_card.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 class ProviderListScreen extends StatefulWidget {
@@ -55,23 +54,14 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             floating: true,
             pinned: true,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.black),
-            title: Text(
-              l10n.availableProviders,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            title: Text(l10n.availableProviders),
             actions: [
               IconButton(
                 onPressed: () {
@@ -90,7 +80,7 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
                       child: Center(
                         child: Text(
                           l10n.noProvidersFound,
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: TextStyle(color: theme.colorScheme.secondary),
                         ),
                       ),
                     )
@@ -113,6 +103,7 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
   }
 
   Widget _buildProviderItem(BuildContext context, Provider provider) {
+    final theme = Theme.of(context);
     final name = '${provider.user.firstName} ${provider.user.lastName}';
     final rating = provider.user.rating ?? 0.0;
     final photoPath = provider.user.profilePhoto;
@@ -142,9 +133,9 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +146,7 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                    color: theme.scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(12),
                     image: backgroundImage != null
                         ? DecorationImage(
@@ -163,7 +154,7 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
                         : null,
                   ),
                   child: backgroundImage == null
-                      ? const Icon(Icons.person, color: Colors.grey, size: 50)
+                      ? Icon(Icons.person, color: theme.colorScheme.secondary, size: 50)
                       : null,
                 ),
                 Positioned(
@@ -218,9 +209,9 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
                       Text(
                         role,
                         style: TextStyle(
-                            color: Colors.grey.shade600, fontSize: 12),
+                            color: theme.colorScheme.secondary, fontSize: 12),
                       ),
-                      const Icon(Icons.more_vert, color: Colors.grey),
+                      Icon(Icons.more_vert, color: theme.colorScheme.secondary),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -237,13 +228,14 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color:
-                          status ? Colors.black : Colors.grey.shade200,
+                          status ? theme.colorScheme.primary : theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(6),
+                       border: status ? null : Border.all(color: theme.colorScheme.secondary),
                     ),
                     child: Text(
                       status ? 'ONLINE' : 'OFFLINE',
                       style: TextStyle(
-                        color: status ? Colors.white : Colors.black,
+                        color: status ? theme.colorScheme.onPrimary : theme.colorScheme.secondary,
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
                       ),
@@ -257,7 +249,7 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
+                            color: theme.scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -272,11 +264,11 @@ class _ProviderListScreenState extends State<ProviderListScreen> {
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.black,
+                          color: theme.colorScheme.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child:
-                            const Icon(Icons.add, color: Colors.white, size: 20),
+                            Icon(Icons.add, color: theme.colorScheme.onPrimary, size: 20),
                       ),
                     ],
                   )

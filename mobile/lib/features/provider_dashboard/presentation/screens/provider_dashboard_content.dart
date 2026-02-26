@@ -67,6 +67,7 @@ class _ProviderDashboardContentState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(userProvider).value;
+    final theme = Theme.of(context);
 
     ref.listen<int>(newRequestNotifierProvider, (previous, next) {
       if (next > (previous ?? 0)) {
@@ -83,39 +84,27 @@ class _ProviderDashboardContentState
     final profileAsyncValue = ref.watch(providerProfileProvider(user.id));
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
       body: profileAsyncValue.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(child: Text('${l10n.errorPrefix}$err')),
         data: (profile) {
           if (profile == null) {
-            return const Center(child: Text('Provider profile not found.'));
+            return Center(child: Text(l10n.providerProfileNotFound));
           }
           final bool isOnline = profile.isOnline;
           return CustomScrollView(
             slivers: [
               SliverAppBar(
-                backgroundColor: Colors.white,
-                pinned: true,
-                elevation: 0.5,
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                      Text(
                       l10n.providerDashboard,
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: theme.textTheme.labelSmall,
                     ),
                     Text(
                       '${user.firstName} ${user.lastName}',
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -130,7 +119,7 @@ class _ProviderDashboardContentState
                         ),
                       );
                     },
-                    icon: const Icon(Icons.settings_outlined, color: Colors.black),
+                    icon: const Icon(Icons.settings_outlined),
                   ),
                 ],
               ),
@@ -164,19 +153,19 @@ class _ProviderDashboardContentState
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: isOnline ? Colors.black : Colors.white,
+                            color: isOnline ? theme.colorScheme.primary : theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
-                             border: isOnline ? null : Border.all(color: Colors.grey.shade200),
+                             border: isOnline ? null : Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.power_settings_new, color: isOnline ? Colors.white : Colors.black),
+                              Icon(Icons.power_settings_new, color: isOnline ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface),
                               const SizedBox(width: 8),
                               Text(
                                 isOnline ? l10n.online.toUpperCase() : l10n.offline.toUpperCase(),
                                 style: TextStyle(
-                                  color: isOnline ? Colors.white : Colors.black,
+                                  color: isOnline ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -203,12 +192,12 @@ class _ProviderDashboardContentState
                           Container(
                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.black,
+                                color: theme.colorScheme.primary,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             child: Text(_incomingJobs.length.toString(),
-                                style: const TextStyle(
-                                    color: Colors.white, fontWeight: FontWeight.bold)),
+                                style: TextStyle(
+                                    color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold)),
                           ),
                     ],
                   ),
@@ -222,7 +211,7 @@ class _ProviderDashboardContentState
                 : _incomingJobs.isEmpty ? SliverToBoxAdapter(
                   child: Center(child: Padding(
                     padding: const EdgeInsets.all(48.0),
-                    child: Text('No new job requests.', style: TextStyle(color: Colors.grey.shade600)),
+                    child: Text(l10n.noNewJobRequests, style: TextStyle(color: theme.colorScheme.secondary)),
                   )),
                 )
                 : SliverPadding(

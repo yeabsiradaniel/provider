@@ -111,23 +111,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentUser = ref.watch(userProvider).value;
+    final theme = Theme.of(context);
     
     final otherUser = currentUser?.id == widget.job.clientId?.id
         ? widget.job.providerId
         : widget.job.clientId;
     
-    final chatTitle = otherUser != null ? '${otherUser.firstName} ${otherUser.lastName}' : 'Chat';
+    final chatTitle = otherUser != null ? '${otherUser.firstName} ${otherUser.lastName}' : l10n.chat;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: Text(
-          chatTitle,
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
+        title: Text(chatTitle),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.call_outlined)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
@@ -163,13 +157,14 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isMe ? Colors.black : Colors.grey.shade200,
+          color: isMe ? theme.colorScheme.primary : theme.colorScheme.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -180,7 +175,7 @@ class _MessageBubble extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            color: isMe ? Colors.white : Colors.black,
+            color: isMe ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
             fontSize: 15,
           ),
         ),
@@ -197,11 +192,12 @@ class _MessageInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade200))
+          color: theme.colorScheme.surface,
+          border: Border(top: BorderSide(color: theme.colorScheme.tertiary.withOpacity(0.5)))
       ),
       child: Row(
         children: [
@@ -209,13 +205,20 @@ class _MessageInputField extends StatelessWidget {
             child: TextField(
               controller: controller,
               decoration: InputDecoration(
-                hintText: 'Type a message...',
-                fillColor: Colors.grey.shade100,
+                hintText: AppLocalizations.of(context)!.typeMessage,
+                fillColor: theme.scaffoldBackgroundColor,
                 filled: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: theme.colorScheme.primary),
                 ),
               ),
               onSubmitted: (_) => onSend(),
@@ -224,8 +227,8 @@ class _MessageInputField extends StatelessWidget {
           const SizedBox(width: 12),
           IconButton(
             style: IconButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
               padding: const EdgeInsets.all(12),
             ),
             icon: const Icon(Icons.send),

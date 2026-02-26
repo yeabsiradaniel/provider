@@ -18,7 +18,6 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-select the top-level category passed to the screen
     _onCategorySelected(widget.category, true);
   }
 
@@ -51,12 +50,12 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
     final childrenStates = category.subCategories.map(_getCheckboxState).toSet();
 
     if (childrenStates.every((state) => state == true)) {
-      return true; // All children are selected
+      return true;
     }
     if (childrenStates.every((state) => state == false)) {
-      return false; // No children are selected
+      return false;
     }
-    return null; // Some children are selected (tristate)
+    return null;
   }
 
   Set<String> _getLeafNodes(List<Category> categories, Set<String> selectedIds) {
@@ -83,24 +82,15 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
     final locale = Localizations.localeOf(context).languageCode;
     final l10n = AppLocalizations.of(context)!;
     final categoryName = widget.category.name[locale] ?? widget.category.name['en']!;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             floating: true,
             pinned: true,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.black),
-            title: Text(
-              categoryName,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            title: Text(categoryName),
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
@@ -113,40 +103,24 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
         padding: const EdgeInsets.all(24.0),
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade200,
-              disabledForegroundColor: Colors.grey.shade400,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: _selectedCategoryIds.isNotEmpty
-                ? () {
-                    final leafNodes = _getLeafNodes([widget.category], _selectedCategoryIds);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProviderListScreen(
-                          categoryIds: leafNodes.toList(),
-                        ),
+        color: theme.colorScheme.surface,
+        child: ElevatedButton(
+          onPressed: _selectedCategoryIds.isNotEmpty
+              ? () {
+                  final leafNodes = _getLeafNodes([widget.category], _selectedCategoryIds);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProviderListScreen(
+                        categoryIds: leafNodes.toList(),
                       ),
-                    );
-                  }
-                : null,
-            child: Text(
-              l10n.viewProviders,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
+                    ),
+                  );
+                }
+              : null,
+          child: Text(l10n.viewProviders),
         ),
       ),
     );
@@ -155,24 +129,21 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
   Widget _buildCategoryTile(Category category, {int depth = 0}) {
     final locale = Localizations.localeOf(context).languageCode;
     final title = category.name[locale] ?? category.name['en']!;
+    final theme = Theme.of(context);
     
     if (category.subCategories.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.only(left: 16.0 * depth),
-        child: Theme(
-          data: ThemeData(
-            unselectedWidgetColor: Colors.black,
-          ),
+      return Material(
+        color: theme.colorScheme.surface,
+        child: Padding(
+          padding: EdgeInsets.only(left: 16.0 * depth),
           child: CheckboxListTile(
-            activeColor: Colors.black,
-            checkColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
             title: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             value: _selectedCategoryIds.contains(category.id),
@@ -185,34 +156,35 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
       );
     }
 
-    return Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        tilePadding: EdgeInsets.only(left: 24 + (16.0 * depth), right: 24),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+    return Material(
+       color: theme.colorScheme.surface,
+      child: Theme(
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.only(left: 24 + (16.0 * depth), right: 24),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
-        ),
-        leading: SizedBox(
-          width: 24,
-          height: 24,
-          child: Checkbox(
-            activeColor: Colors.black,
-            checkColor: Colors.white,
-            value: _getCheckboxState(category),
-            tristate: true,
-            onChanged: (bool? value) {
-              _onCategorySelected(category, value ?? false);
-            },
+          leading: SizedBox(
+            width: 24,
+            height: 24,
+            child: Checkbox(
+              value: _getCheckboxState(category),
+              tristate: true,
+              onChanged: (bool? value) {
+                _onCategorySelected(category, value ?? false);
+              },
+            ),
           ),
+          children: category.subCategories
+              .map((sub) => _buildCategoryTile(sub, depth: depth + 1))
+              .toList(),
         ),
-        children: category.subCategories
-            .map((sub) => _buildCategoryTile(sub, depth: depth + 1))
-            .toList(),
       ),
     );
   }

@@ -60,13 +60,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(l10n.forgotPin, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text(l10n.forgotPin),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -81,16 +78,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Text(
                     l10n.forgotPin,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                    const SizedBox(height: 8),
                   Text(
-                    'Enter your phone number to reset your PIN', // This should be localized
+                    l10n.enterYourPhoneNumberToReset,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                    style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.secondary),
                   ),
                   const SizedBox(height: 48),
                   PhoneInput(
@@ -107,7 +101,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         child: AsymmetricButton(
-          label: _isLoading ? l10n.sending.toUpperCase() : 'SEND OTP', // This should be localized
+          label: _isLoading ? l10n.sending.toUpperCase() : l10n.sendOtp,
           onPressed: !_isLoading ? _sendOtp : null,
         ),
       ),

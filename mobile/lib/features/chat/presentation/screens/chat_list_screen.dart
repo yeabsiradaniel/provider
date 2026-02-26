@@ -53,8 +53,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -64,36 +64,25 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                   SliverAppBar(
                     floating: true,
                     pinned: true,
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    elevation: 0,
-                    title: Text(
-                      l10n.chat,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    title: Text(l10n.chat),
                   ),
                   if (_conversations.isEmpty)
-                    const SliverFillRemaining(
+                    SliverFillRemaining(
                       child: Center(
                         child: Text(
-                          "You have no active chats.",
-                          style: TextStyle(color: Colors.grey),
+                          l10n.youHaveNoActiveChats,
+                          style: TextStyle(color: theme.colorScheme.secondary),
                         ),
                       ),
                     )
                   else
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final job = _conversations[index];
-                            return _buildChatItem(context, job: job);
-                          },
-                          childCount: _conversations.length,
-                        ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final job = _conversations[index];
+                          return _buildChatItem(context, job: job);
+                        },
+                        childCount: _conversations.length,
                       ),
                     ),
                 ],
@@ -105,6 +94,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   Widget _buildChatItem(BuildContext context, {required Job job}) {
     final currentUser = ref.watch(userProvider).value;
     final bool isProvider = currentUser?.role == 'provider';
+    final theme = Theme.of(context);
 
     final User? otherUser = isProvider ? job.clientId : job.providerId;
 
@@ -138,7 +128,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: Colors.grey.shade100),
+            bottom: BorderSide(color: theme.colorScheme.tertiary.withOpacity(0.5)),
           ),
         ),
         child: Row(
@@ -147,7 +137,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: theme.colorScheme.tertiary.withOpacity(0.5),
                 shape: BoxShape.circle,
                 image: backgroundImage != null
                     ? DecorationImage(
@@ -163,7 +153,6 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
                       ),
                     )
@@ -179,7 +168,6 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -187,7 +175,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                     job.serviceName,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey.shade600,
+                      color: theme.colorScheme.secondary,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -196,7 +184,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             ),
             Icon(
               Icons.chevron_right,
-              color: Colors.grey.shade400,
+              color: theme.colorScheme.tertiary,
               size: 20,
             ),
           ],

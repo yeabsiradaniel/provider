@@ -16,21 +16,22 @@ class JobRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: theme.colorScheme.tertiary.withOpacity(0.5)),
         ),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.grey.shade100,
-              foregroundColor: Colors.black,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              foregroundColor: theme.colorScheme.onSurface,
               child: Text(
                 initials,
                 style: const TextStyle(
@@ -53,14 +54,14 @@ class JobRequestCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     details,
-                    style: TextStyle(color: Colors.grey.shade600),
+                    style: TextStyle(color: theme.colorScheme.secondary),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 16),
-            Icon(Icons.chevron_right, color: Colors.grey.shade400),
+            Icon(Icons.chevron_right, color: theme.colorScheme.tertiary),
           ],
         ),
       ),
