@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,21 +30,10 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   }
 
   Future<void> _fetchConversations() async {
-    if (kDebugMode) {
-      log('===== CUSTOMER CHAT LIST NAVIGATION =====');
-    }
     try {
       final jobs = await _chatService.getConversations();
-      if (kDebugMode) {
-        log('===== CUSTOMER CHAT LIST PARSED MODEL =====');
-        log('Parsed conversations count: ${jobs.length}');
-      }
       if (mounted) {
         setState(() {
-          if (kDebugMode) {
-            log('===== CUSTOMER CHAT LIST STATE UPDATE =====');
-            log('Updating state with ${jobs.length} conversations.');
-          }
           _conversations = jobs;
           _isLoading = false;
         });
@@ -59,32 +47,58 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
           _isLoading = false;
         });
       }
-      // Handle error
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) {
-      log('===== CUSTOMER CHAT LIST UI BUILD =====');
-      log('Final list length used by UI: ${_conversations.length}');
-    }
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.chat),
-      ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _conversations.isEmpty
-              ? Center(child: Text("You have no active chats."))
-              : ListView.builder(
-                  itemCount: _conversations.length,
-                  itemBuilder: (context, index) {
-                    final job = _conversations[index];
-                    return _buildChatItem(context, job: job);
-                  },
-                ),
+          : RefreshIndicator(
+              onRefresh: _fetchConversations,
+              child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    floating: true,
+                    pinned: true,
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    elevation: 0,
+                    title: Text(
+                      l10n.chat,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  if (_conversations.isEmpty)
+                    const SliverFillRemaining(
+                      child: Center(
+                        child: Text(
+                          "You have no active chats.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final job = _conversations[index];
+                            return _buildChatItem(context, job: job);
+                          },
+                          childCount: _conversations.length,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -92,7 +106,6 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     final currentUser = ref.watch(userProvider).value;
     final bool isProvider = currentUser?.role == 'provider';
 
-    // Determine the other user in the chat
     final User? otherUser = isProvider ? job.clientId : job.providerId;
 
     ImageProvider? backgroundImage;
@@ -106,17 +119,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
       }
     }
 
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: backgroundImage,
-        child: backgroundImage == null
-            ? Text(otherUser?.firstName.substring(0, 1) ?? '?')
-            : null,
-      ),
-      title: Text(otherUser?.firstName ?? 'Chat'),
-      subtitle: Text(job.serviceName), // This could be the last message
+    return InkWell(
       onTap: () {
-        // Navigate to the correct chat screen based on user role
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -130,6 +134,74 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
           ),
         );
       },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade100),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                shape: BoxShape.circle,
+                image: backgroundImage != null
+                    ? DecorationImage(
+                        image: backgroundImage,
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: backgroundImage == null
+                  ? Center(
+                      child: Text(
+                        otherUser?.firstName.substring(0, 1) ?? '?',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    otherUser?.firstName ?? 'Chat',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    job.serviceName,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: Colors.grey.shade400,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

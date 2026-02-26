@@ -1,12 +1,12 @@
-
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/features/auth/domain/services/auth_exception.dart';
 import 'package:mobile/features/auth/domain/services/auth_service.dart';
 import 'package:mobile/features/auth/presentation/screens/registration_screen.dart';
+import 'package:mobile/features/auth/presentation/screens/terms_and_agreement_screen.dart';
 import 'package:mobile/features/client_dashboard/presentation/screens/client_home_screen.dart';
-import 'package:mobile/features/provider_dashboard/presentation/screens/category_selection_screen.dart';
+import 'package:mobile/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:mobile/features/provider_dashboard/presentation/screens/provider_dashboard_screen.dart';
 import 'package:mobile/features/user/domain/providers/user_provider.dart';
 import 'package:mobile/features/language_selection/presentation/widgets/asymmetric_button.dart';
@@ -15,9 +15,14 @@ import 'package:mobile/l10n/app_localizations.dart';
 class OtpScreen extends ConsumerStatefulWidget {
   final String phoneNumber;
   final Map<String, dynamic> userData;
+  final bool isLogin;
 
-  const OtpScreen({Key? key, required this.phoneNumber, required this.userData})
-      : super(key: key);
+  const OtpScreen({
+    Key? key,
+    required this.phoneNumber,
+    required this.userData,
+    this.isLogin = false,
+  }) : super(key: key);
 
   @override
   _OtpScreenState createState() => _OtpScreenState();
@@ -44,27 +49,30 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         final userRole = response['user']['role'];
         final isNewUser = response['isNewUser'] ?? false;
 
-        if (userRole == 'client') {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const ClientHomeScreen()),
-            (Route<dynamic> route) => false,
-          );
-        } else if (userRole == 'provider') {
-          if (isNewUser) {
+        if (mounted) {
+          if (userRole == 'client') {
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) => const CategorySelectionScreen()),
+              MaterialPageRoute(builder: (context) => const ClientHomeScreen()),
               (Route<dynamic> route) => false,
             );
-          } else {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) => const ProviderDashboardScreen()),
-              (Route<dynamic> route) => false,
-            );
+          } else if (userRole == 'provider') {
+            if (isNewUser) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const TermsAndAgreementScreen()),
+                (Route<dynamic> route) => false,
+              );
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const ProviderDashboardScreen()),
+                (Route<dynamic> route) => false,
+              );
+            }
           }
         }
       } on AuthException catch (e) {
+        if (!mounted) return;
         final l10n = AppLocalizations.of(context)!;
         String displayMessage;
 
@@ -134,71 +142,68 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.enterOtp,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.bodyLarge?.color,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.otpSentTo(widget.phoneNumber),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).textTheme.bodySmall?.color,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                TextFormField(
-                  controller: _otpController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 6,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.fieldRequired;
-                    }
-                    if (value.length != 6) {
-                      return l10n.otpMustBe6Digits;
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'OTP',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).disabledColor,
-                        width: 2,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).disabledColor,
-                        width: 2,
-                      ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                   const SizedBox(height: 24),
+                  Text(
+                    l10n.enterOtp,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                AsymmetricButton(
-                  label: _isLoading ? l10n.verifying : l10n.verify,
-                  onPressed: _isLoading ? null : _verifyOtp,
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.otpSentTo(widget.phoneNumber),
+                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  CustomTextField(
+                    label: 'OTP',
+                    controller: _otpController,
+                    isNumeric: true,
+                    maxLength: 6,
+                    hintText: 'Enter 6-digit OTP',
+                    customValidator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return l10n.fieldRequired;
+                      }
+                      if (value.length != 6) {
+                        return l10n.otpMustBe6Digits;
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
+       bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+        child: AsymmetricButton(
+          label: _isLoading ? l10n.verifying.toUpperCase() : l10n.verify,
+          onPressed: _isLoading ? null : _verifyOtp,
         ),
       ),
     );

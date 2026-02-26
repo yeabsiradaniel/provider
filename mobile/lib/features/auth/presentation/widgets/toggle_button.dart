@@ -22,10 +22,9 @@ class _RoleToggleButtonState extends State<RoleToggleButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
@@ -50,30 +49,18 @@ class _RoleToggleButtonState extends State<RoleToggleButton> {
         widget.onRoleChanged(index);
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? Colors.black : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [],
         ),
         child: Text(
-          text.toUpperCase(),
+          text,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            color: isSelected
-                ? const Color(0xFF0056B3)
-                : const Color(0xFF64748B),
-            letterSpacing: 1.5,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Colors.white : Colors.grey.shade600,
           ),
         ),
       ),

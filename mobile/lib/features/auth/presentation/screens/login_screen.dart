@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/domain/services/auth_exception.dart';
 import 'package:mobile/features/auth/domain/services/auth_service.dart';
@@ -31,11 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onRoleChanged(int index) {
     setState(() {
       _selectedRole = index;
-      _formKey.currentState?.reset();
     });
   }
 
-  Future<void> _getOtp() async {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -47,23 +45,30 @@ class _LoginScreenState extends State<LoginScreen> {
       };
 
       try {
+        // NOTE: In a real login flow, this would call a login endpoint,
+        // not request OTP. Reusing for this project's structure.
         await _authService.requestOtp(phoneNumber);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                OtpScreen(phoneNumber: phoneNumber, userData: userData),
-          ),
-        );
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  OtpScreen(phoneNumber: phoneNumber, userData: userData),
+            ),
+          );
+        }
       } on AuthException catch (e) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)), // Using e.message which is user-friendly
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message)),
+          );
+        }
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -79,24 +84,30 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const SizedBox(height: 48),
                   Text(
-                    l10n.welcome,
-                    style: TextStyle(
-                      fontSize: 32,
+                    l10n.welcomeBack,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                      fontFamily: 'Noto Sans Ethiopic',
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.loginToYourAccount,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                   ),
                   const SizedBox(height: 32),
                   RoleToggleButton(
@@ -113,6 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     maxLength: 6,
                     obscureText: true,
                     controller: _pinController,
+                    hintText: l10n.enter6DigitPIN,
                   ),
                   const SizedBox(height: 16),
                   GestureDetector(
@@ -124,11 +136,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       );
                     },
-                    child: Center(
+                    child: Align(
+                      alignment: Alignment.centerRight,
                       child: Text(
                         l10n.forgotPin,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -136,15 +150,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
                   AsymmetricButton(
-                    label: _isLoading ? l10n.sending : l10n.login,
-                    onPressed: !_isLoading ? _getOtp : null,
+                    label: _isLoading ? l10n.sending.toUpperCase() : l10n.login,
+                    onPressed: !_isLoading ? _login : null,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const RegistrationScreen(),
+                       Navigator.pushReplacement(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => const RegistrationScreen(),
+                          transitionDuration: Duration.zero,
                         ),
                       );
                     },
@@ -153,13 +169,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: TextSpan(
                           text: l10n.dontHaveAccount,
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
                           ),
                           children: [
                             TextSpan(
                               text: l10n.register,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),
                             ),
@@ -167,7 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),

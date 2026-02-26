@@ -18,13 +18,13 @@ class AppLocalizationsAm extends AppLocalizations {
   String get amharic => 'አማርኛ';
 
   @override
-  String get english => 'English';
+  String get english => 'እንግሊዝኛ';
 
   @override
-  String get defaultStatus => 'Default';
+  String get defaultStatus => 'ነባሪ';
 
   @override
-  String get supported => 'Supported';
+  String get supported => 'የሚደገፍ';
 
   @override
   String get continueButton => 'ቀጥል';
@@ -33,7 +33,7 @@ class AppLocalizationsAm extends AppLocalizations {
   String get splashTitle => 'አገልግሎት ሊንክ';
 
   @override
-  String get splashSubtitle => 'ደንበኞችን እና ባለሞያ የሚያገናኝ ፕሪሚየም የገበያ ቦታ።';
+  String get splashSubtitle => 'ደንበኞችን ታማኝ እና ጥራታቸዉን ከጠበቁ ባለሞያዎች ጋር እናገናኛለን.';
 
   @override
   String get welcome => 'እንኳን ደህና መጡ';
@@ -177,7 +177,7 @@ class AppLocalizationsAm extends AppLocalizations {
   String get repair => 'ጥገና';
 
   @override
-  String get boleAddisAbaba => 'ቦሌ, አዲስ አበባ';
+  String get boleAddisAbaba => 'አካባቢ በመጫን ላይ';
 
   @override
   String discountOff(Object amount) {
@@ -389,20 +389,103 @@ class AppLocalizationsAm extends AppLocalizations {
   String get decline => 'ውድቅ አድርግ';
 
   @override
-  String get rateAndPay => 'Rate & Pay';
+  String get rateAndPay => 'ደረጃ ይስጡ እና ይክፈሉ';
 
   @override
-  String get howWasYourService => 'How was your service?';
+  String get howWasYourService => 'አገልግሎቱ እንዴት ነበር?';
 
   @override
-  String get amountPaid => 'Amount Paid';
+  String get amountPaid => 'የተከፈለው መጠን';
 
   @override
-  String get pleaseEnterAmount => 'Please enter an amount';
+  String get pleaseEnterAmount => 'እባክዎ መጠን ያስገቡ';
 
   @override
-  String get pleaseEnterValidNumber => 'Please enter a valid number';
+  String get pleaseEnterValidNumber => 'እባክዎ ትክክለኛ ቁጥር ያስገቡ';
 
   @override
-  String get submitPaymentAndReview => 'Submit Payment & Review';
+  String get submitPaymentAndReview => 'ክፍያ እና ግምገማ ያስገቡ';
+
+  @override
+  String get searchForServicesAndPackages => 'አገልግሎቶችን እና ፓኬጆችን ይፈልጉ';
+
+  @override
+  String get cleaningServices => 'የጽዳት አገልግሎቶች';
+
+  @override
+  String get qualityWorkAffordablePrice => 'ጥራት ያለው ስራ\nበተመጣጣኝ ዋጋ';
+
+  @override
+  String get weBringProfessionalCleaningServices =>
+      'ሙያዊ የጽዳት አገልግሎቶችን ወደ ቤትዎ እናመጣለን';
+
+  @override
+  String get welcomeBack => 'እንኳን ደህና መመለስ!';
+
+  @override
+  String get loginToYourAccount => 'ወደ መለያዎ ይግቡ';
+
+  @override
+  String get createYourAccount => 'መለያዎን ይፍጠሩ';
+
+  @override
+  String get photoLibrary => 'የፎቶ ቤተ-መጽሐፍት';
+
+  @override
+  String get camera => 'ካሜራ';
+
+  @override
+  String mustBeNdigits(int maxLength) {
+    return '$maxLength አሃዞች መሆን አለበት';
+  }
+
+  @override
+  String get describeYourIssue => 'ችግርዎን ይግለጹ';
+
+  @override
+  String get preferredDates => 'የሚመረጡ ቀኖች';
+
+  @override
+  String get selectADateRange => 'የቀን ክልል ይምረጡ';
+
+  @override
+  String get pleaseFillAllFields => 'እባክዎ ከመያዝዎ በፊት ሁሉንም መስኮች ይሙሉ.';
+
+  @override
+  String get summary => 'ማጠቃለያ';
+
+  @override
+  String get dates => 'ቀኖች';
+
+  @override
+  String get requestSent => 'ጥያቄ ተልኳል!';
+
+  @override
+  String get providerNotified =>
+      'ባለሙያው እንዲያውቅ ተደርጓል። የጥያቄዎን ሁኔታ በቦታ ማስያዣዎች ትር ውስጥ ማየት ይችላሉ።';
+
+  @override
+  String get backToHome => 'ወደ ዋናው ገጽ ይመለሱ';
+
+  @override
+  String get enterDetailedDescription => 'ዝርዝር መግለጫ ያስገቡ...';
+
+  @override
+  String get enter6DigitPIN => 'ባለ 6-አሃዝ ፒን ያስገቡ';
+
+  @override
+  String get enterYourFirstName => 'የመጀመሪያ ስምዎን ያስገቡ';
+
+  @override
+  String get enterYourLastName => 'የአያት ስምዎን ያስገቡ';
+
+  @override
+  String get providerAgreementTitle => 'FIXADDIS የአገልግሎት አቅራቢ ስምምነት';
+
+  @override
+  String get iAgreeToTheTerms => 'በข้อตกลงและเงื่อนไขฉันยอมรับ';
+
+  @override
+  String get providerAgreementText =>
+      '(የግል ሥራ ተቋራጭ ስምምነት)\nይህ ስምምነት በሚከተሉት መካከል ተደርጓል፦\nFIXADDIS (“መተግበሪያ”)\nእና\nየተመዘገበው አገልግሎት አቅራቢ (“አቅራቢ”)።\n\nበመፈረም ወይም መተግበሪያውን በመጠቀም፣ አቅራቢው ለሚከተሉት ተስማምቷል፦\n\n1️⃣ ግንኙነት\n\n1.1 አቅራቢው የግል ሥራ ተቋራጭ ነው፣ የFixAddis ሠራተኛ፣ አጋር ወይም ወኪል አይደለም።\n1.2 አቅራቢው ለሁሉም ግብሮች፣ ፈቃዶች፣ መሣሪያዎች፣ መጓጓዣ፣ ኢንሹራንስ (የሚመለከተው ከሆነ) እና የአሠራር ወጪዎች ኃላፊ ነው።\n1.3 FixAddis ደንበኞችን እና አቅራቢዎችን የሚያገናኝ ዲጂታል የገበያ ቦታ ብቻ ሆኖ ይሠራል።\n\n2️⃣ የአገልግሎቶች ወሰን\n\nአቅራቢው የሚከተሉትን አገልግሎቶች ሊያቀርብ ይችላል፥\nየመንገድ ዳር መካኒክ አገልግሎቶች\nየቤት ጥገና (የቧንቧ፣ የኤሌክትሪክ፣ የአናጢነት፣ ወዘተ)\nየቤት ዕቃዎች ጥገና\nየጽዳት አገልግሎቶች\nየተከላ አገልግሎቶች\nበመተግበሪያው ላይ የተዘረዘሩ ሌሎች የተፈቀዱ የሙያ አገልግሎቶች\nአቅራቢዎች ብቁ የሆኑባቸውን አገልግሎቶች ብቻ ማከናወን ይችላሉ።\n\n3️⃣ ማረጋገጫ እና ብቁነት\n\nመተግበሪያው የሚያረጋግጣቸው፦\nየገባው መታወቂያ ትክክለኛነት\nትክክለኛ የግል እና የመገኛ አድራሻዎች\nበቂ ችሎታ እና ልምድ\nበሕግ የሚፈለጉ ማናቸውም ፈቃዶች\nአቅራቢው በኢትዮጵያ ውስጥ አገልግሎት ለመስጠት ሕጋዊ ብቁነት\nየሐሰት መረጃ መስጠት ወዲያውኑ ውል እንዲቋረጥ ያደርጋል።\n\n4️⃣ የሙያ ሥነ ምግባር እና ተግሣጽ\n\nአቅራቢው ለሚከተሉት ተስማምቷል፦\nደንበኞችን በአክብሮት መያዝ\nሥራ ከመጀመሩ በፊት ዋጋን በግልጽ ማስረዳት\nተጨማሪ ክፍያዎች ከመፈጸሙ በፊት የደንበኛን ይሁንታ ማግኘት\nበተመጣጣኝ ጊዜ ውስጥ መድረስ\nየሙያዊ ገጽታን እና ባህሪን መጠበቅ\n\nአቅራቢው የሚከተሉትን ማድረግ የለበትም፦\n\nደንበኞችን ማዋከብ፣ ማስፈራራት ወይም ማሸማቀቅ\nዋጋን ከልክ በላይ መጫን ወይም ዋጋን ያለአግባብ ማዛባት\nበአልኮል ወይም በአደንዛዥ ዕፅ ተጽዕኖ ሥር አገልግሎት መስጠት\nበመድልዎ ውስጥ መሳተፍ\nከተስማማው መጠን በላይ ክፍያ መጠየቅ\nFIXADDISን በተሳሳተ መንገድ መወከል\nከባድ ጥሰቶች ወዲያውኑ ውል እንዲቋረጥ ያደርጋሉ።\n\n5️⃣ የደህንነት ግዴታዎች\n\nአቅራቢው ሙሉ በሙሉ ኃላፊ ነው ለ፦\n\nደህንነቱ የተጠበቀ የሥራ ልምዶች\nትክክለኛ መሣሪያዎችን መጠቀም\nየመንገድ ዳር እና የሥራ ቦታ ደህንነት\nንብረት ላይ ጉዳት እንዳይደርስ ማድረግ\nየትራፊክ እና የደህንነት ሕጎችን ማክበር\n\nFixAddis ለሚከተሉት ተጠያቂ አይደለም፦\n\nጉዳቶች\nየንብረት ውድመት\nየሜካኒካዊ ብልሽት\nበአቅራቢው ቸልተኝነት ምክንያት ለሚከሰቱ የሥራ ጉድለቶች\nአቅራቢው ለሚያከናውናቸው አገልግሎቶች ሙሉ ሕጋዊ ኃላፊነት ይወስዳል።\n\n6️⃣ የዋጋ አወጣጥ እና ኮሚሽን\n\n6.1 አቅራቢው የመተግበሪያውን የዋጋ አሰጣጥ መመሪያዎችን ለመከተል ተስማምቷል።\n6.2 የመጨረሻው ዋጋ ሥራ ከመጀመሩ በፊት መስማማት አለበት።\n6.3 አቅራቢው የተስማማበትን ኮሚሽን ወይም የመተግበሪያ ክፍያዎችን ለመክፈል ተስማምቷል።\n6.4 ኮሚሽን አለመክፈል ለእገዳ እና ለሕጋዊ እርምጃ ሊዳርግ ይችላል።\n\n7️⃣ የማለፍ-የማገድ አንቀጽ\n\nአቅራቢው ተስማምቷል፦\nደንበኞችን ከመተግበሪያው ውጭ ላለማግባባት\nለወደፊት ቀጥታ ሥራዎች የግል መገኛ አድራሻዎችን ላለማጋራት\nሆን ብሎ ኮሚሽን ላለማስቀረት\nመጣስ ለቋሚ መወገድ እና ለገንዘብ ቅጣት ሊዳርግ ይችላል።\n\n8️⃣ አገልግሎት አቅራቢዎች ደረጃ እና የአፈጻጸም ክትትል\n\nFIXADDIS የሚከተሉትን በጥብቅ ይከታተላል:-\n\nየአገልግሎት አቅራቢዎች ደረጃ አሰጣጥ\n\nየደንበኛ አስተያየት\nየቅሬታ ድግግሞሽ\nየዋጋ ተገቢነት\nየስራ መቀበያ እና ማጠናቀቂያ ፍጥነት\n\nተደጋጋሚ ዝቅተኛ አፈፃፀም ያላቸው አቅራቢዎች፦\n\nማስጠንቀቂያ\nጊዜያዊ እገዳ\nቋሚ እገዳን ያስተናግዳሉ።\n\n9️⃣ የደንበኛ ቅሬታዎች እና ተመላሽ ገንዘቦች\n\nአገልግሎት አቅራቢው የሚከተለውን ለማድረግ ተስማምቷል፦\n\nከምርመራዎች ጋር መተባበር\nበ48 ሰዓታት ውስጥ ምላሽ መስጠት\nፍትሃዊ የክርክር መፍትሄን መቀበል\n\nFIXADDIS የተረጋገጠ ጥፋት ሲኖር ተመላሽ ገንዘብ ሊጠይቅ ይችላል።\n\n1️⃣0️⃣ እገዳ እና መቋረጥ\n\nFIXADDIS በሚከተሉት ምክንያቶች ወዲያውኑ አገልግሎት አቅራቢዉን ሊያግድ ወይም ሊሠርዝ ይችላል፦\n\nየደህንነት ጥሰቶች\nማጭበርበር\nትንኮሳ\nየወንጀል ድርጊት\nተደጋጋሚ ደካማ አፈጻጸም \nየኮሚሽን ማጭበርበር\n\nበከባድ ጉዳዮች ላይ ማስጠንቀቂያ አያስፈልግም።\n1️⃣1️⃣ ሚስጥራዊነት\n\nአቅራቢው ላለማሳወቅ ተስማምቷል፦\n\nየደንበኛ መረጃ\nውስጣዊ መመሪያዎች\nየዋጋ አወጣጥ መዋቅሮች\nየመተግበሪያ የአሠራር መረጃ\n\n1️⃣2️⃣ ማሻሻያዎች\n\nFIXADDIS ይህንን ስምምነት በማንኛውም ጊዜ ሊያዘምን ይችላል።\nመተግበሪያን መጠቀም መቀጠል መስማማትን ያሳያል።';
 }

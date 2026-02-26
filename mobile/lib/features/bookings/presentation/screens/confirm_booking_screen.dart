@@ -55,74 +55,80 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
     final String profilePhoto = widget.jobDetails['profilePhoto'] ?? '';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.confirmBooking),
-        backgroundColor: Theme.of(context).colorScheme.background,
-        elevation: 0,
-      ),
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Summary', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 24),
-
-            // Provider Info Card
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    ProfileAvatar(imageUrl: profilePhoto, radius: 25),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Provider', style: TextStyle(color: Colors.grey)),
-                          const SizedBox(height: 4),
-                          Text(providerName, style: Theme.of(context).textTheme.titleLarge),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            elevation: 0,
+            pinned: true,
+            iconTheme: const IconThemeData(color: Colors.black),
+            title: Text(
+              l10n.confirmBooking,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Service Details Card
-            _buildInfoCard(
-              context: context,
-              icon: Icons.work_outline,
-              title: 'Service',
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(serviceName, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(l10n.summary, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 24),
+
+                  // Provider Info
+                  _buildSectionHeader(l10n.provider),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade200)
+                    ),
+                    child: Row(
+                      children: [
+                        ProfileAvatar(imageUrl: profilePhoto, radius: 24),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(providerName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Service Details
+                  _buildSectionHeader(l10n.services),
+                  const SizedBox(height: 12),
+                  _buildInfoRow(icon: Icons.work_outline, text: serviceName),
                   const SizedBox(height: 8),
-                  Text(description, style: const TextStyle(color: Colors.grey)),
+                   Padding(
+                     padding: const EdgeInsets.only(left: 36.0), // Align with icon
+                     child: Text(description, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                   ),
+                  const SizedBox(height: 24),
+
+                  // Date & Time
+                  _buildSectionHeader(l10n.dates),
+                  const SizedBox(height: 12),
+                  _buildInfoRow(icon: Icons.calendar_today_outlined, text: '$startDate to $endDate'),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Date & Time Card
-            _buildInfoCard(
-              context: context,
-              icon: Icons.calendar_today_outlined,
-              title: 'Dates',
-              child: Text('$startDate to $endDate', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
+          )
+        ],
       ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Colors.grey.shade200))
+        ),
         child: Row(
           children: [
             Expanded(
@@ -131,8 +137,9 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  side: BorderSide(color: Colors.grey.shade300)
                 ),
-                child: Text(l10n.cancel),
+                child: Text(l10n.cancel, style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(width: 16),
@@ -140,8 +147,11 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
               child: ElevatedButton(
                 onPressed: _isBooking ? null : _confirmBooking,
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
                 ),
                 child: _isBooking
                     ? const SizedBox(
@@ -149,7 +159,7 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
                         width: 24,
                         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
                       )
-                    : Text(l10n.confirmBooking),
+                    : Text(l10n.confirmBooking, style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -157,31 +167,28 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
       ),
     );
   }
-
-  Widget _buildInfoCard({required BuildContext context, required IconData icon, required String title, required Widget child}) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 8),
-                  child,
-                ],
-              ),
-            ),
-          ],
-        ),
+  
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        color: Colors.grey.shade500,
+        fontWeight: FontWeight.bold,
+        fontSize: 12,
+        letterSpacing: 0.8,
       ),
+    );
+  }
+
+  Widget _buildInfoRow({required IconData icon, required String text}) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.black, size: 20),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        ),
+      ],
     );
   }
 }

@@ -27,21 +27,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       final phoneNumber = '+251' + _phoneController.text;
       try {
         await _authService.requestOtp(phoneNumber);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ResetPinScreen(phoneNumber: phoneNumber),
-          ),
-        );
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResetPinScreen(phoneNumber: phoneNumber),
+            ),
+          );
+        }
       } on AuthException catch (e) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)), // Using e.message which is user-friendly
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message)),
+          );
+        }
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -58,37 +63,52 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(l10n.forgotPin),
+        title: Text(l10n.forgotPin, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.forgotPin,
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 24),
+                  Text(
+                    l10n.forgotPin,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                PhoneInput(
-                  controller: _phoneController,
-                  labelText: l10n.phone,
-                ),
-                const SizedBox(height: 32),
-                AsymmetricButton(
-                  label: _isLoading ? l10n.sending : 'SEND OTP',
-                  onPressed: !_isLoading ? _sendOtp : null,
-                ),
-              ],
+                   const SizedBox(height: 8),
+                  Text(
+                    'Enter your phone number to reset your PIN', // This should be localized
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  ),
+                  const SizedBox(height: 48),
+                  PhoneInput(
+                    controller: _phoneController,
+                    labelText: l10n.phone,
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+        child: AsymmetricButton(
+          label: _isLoading ? l10n.sending.toUpperCase() : 'SEND OTP', // This should be localized
+          onPressed: !_isLoading ? _sendOtp : null,
         ),
       ),
     );

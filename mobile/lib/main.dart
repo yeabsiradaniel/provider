@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/services/socket_service.dart';
+import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/features/auth/presentation/screens/auth_check_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,8 +48,8 @@ class MyApp extends ConsumerWidget {
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      theme: ThemeData.light(), // Define your light theme
-      darkTheme: ThemeData.dark(), // Define your dark theme
+      theme: AppTheme.lightTheme, // Define your light theme
+      darkTheme: AppTheme.darkTheme, // Define your dark theme
       themeMode: themeMode,
       // Use a Builder to ensure we have a clean startup sequence.
       home: Builder(

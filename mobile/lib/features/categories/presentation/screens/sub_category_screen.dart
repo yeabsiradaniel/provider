@@ -82,32 +82,71 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).languageCode;
     final l10n = AppLocalizations.of(context)!;
+    final categoryName = widget.category.name[locale] ?? widget.category.name['en']!;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.category.name[locale] ?? widget.category.name['en']!),
-      ),
-      body: ListView(
-        children: widget.category.subCategories
-            .map((sub) => _buildCategoryTile(sub, depth: 1))
-            .toList(),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: Colors.black),
+            title: Text(
+              categoryName,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final sub = widget.category.subCategories[index];
+                return _buildCategoryTile(sub, depth: 0);
+              },
+              childCount: widget.category.subCategories.length,
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: _selectedCategoryIds.isNotEmpty
-              ? () {
-                  final leafNodes = _getLeafNodes([widget.category], _selectedCategoryIds);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProviderListScreen(
-                        categoryIds: leafNodes.toList(),
+        padding: const EdgeInsets.all(24.0),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: Colors.grey.shade200,
+              disabledForegroundColor: Colors.grey.shade400,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: _selectedCategoryIds.isNotEmpty
+                ? () {
+                    final leafNodes = _getLeafNodes([widget.category], _selectedCategoryIds);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProviderListScreen(
+                          categoryIds: leafNodes.toList(),
+                        ),
                       ),
-                    ),
-                  );
-                }
-              : null,
-          child: Text(l10n.viewProviders),
+                    );
+                  }
+                : null,
+            child: Text(
+              l10n.viewProviders,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
         ),
       ),
     );
@@ -115,32 +154,61 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
 
   Widget _buildCategoryTile(Category category, {int depth = 0}) {
     final locale = Localizations.localeOf(context).languageCode;
+    final title = category.name[locale] ?? category.name['en']!;
     
     if (category.subCategories.isEmpty) {
-      // Leaf node
       return Padding(
         padding: EdgeInsets.only(left: 16.0 * depth),
-        child: CheckboxListTile(
-          title: Text(category.name[locale] ?? category.name['en']!),
-          value: _selectedCategoryIds.contains(category.id),
-          onChanged: (bool? value) {
-            _onCategorySelected(category, value);
-          },
+        child: Theme(
+          data: ThemeData(
+            unselectedWidgetColor: Colors.black,
+          ),
+          child: CheckboxListTile(
+            activeColor: Colors.black,
+            checkColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+            title: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            value: _selectedCategoryIds.contains(category.id),
+            onChanged: (bool? value) {
+              _onCategorySelected(category, value);
+            },
+            controlAffinity: ListTileControlAffinity.trailing,
+          ),
         ),
       );
     }
 
-    // Parent node
-    return Padding(
-      padding: EdgeInsets.only(left: 16.0 * depth),
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
-        title: Text(category.name[locale] ?? category.name['en']!),
-        leading: Checkbox(
-          value: _getCheckboxState(category),
-          tristate: true,
-          onChanged: (bool? value) {
-            _onCategorySelected(category, value ?? false);
-          },
+        tilePadding: EdgeInsets.only(left: 24 + (16.0 * depth), right: 24),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        leading: SizedBox(
+          width: 24,
+          height: 24,
+          child: Checkbox(
+            activeColor: Colors.black,
+            checkColor: Colors.white,
+            value: _getCheckboxState(category),
+            tristate: true,
+            onChanged: (bool? value) {
+              _onCategorySelected(category, value ?? false);
+            },
+          ),
         ),
         children: category.subCategories
             .map((sub) => _buildCategoryTile(sub, depth: depth + 1))

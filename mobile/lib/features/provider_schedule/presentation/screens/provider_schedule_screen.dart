@@ -27,6 +27,9 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
     super.initState();
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier([]);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(providerScheduleProvider);
+    });
   }
 
   @override
@@ -67,8 +70,10 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(job.serviceName),
-          content: Text("Status: ${job.status}\nDescription: ${job.description ?? ''}"),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(job.serviceName, style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Text("Status: ${job.status.toUpperCase()}\n\nDescription:\n${job.description ?? 'No description provided.'}"),
           actions: [
             if (job.status == 'ACCEPTED' || job.status == 'ACTIVE')
               TextButton(
@@ -76,11 +81,11 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
                   Navigator.of(context).pop();
                   _finishJob(job.id);
                 },
-                child: const Text('Mark as Finished'),
+                child: const Text('Mark as Finished', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+              child: const Text('Close', style: TextStyle(color: Colors.grey)),
             ),
           ],
         );
@@ -94,92 +99,131 @@ class _ProviderScheduleScreenState extends ConsumerState<ProviderScheduleScreen>
     final scheduleAsyncValue = ref.watch(providerScheduleProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.schedule),
-      ),
+      backgroundColor: Colors.grey.shade50,
       body: scheduleAsyncValue.when(
-        loading: () {
-          return const Center(child: CircularProgressIndicator());
-        },
-        error: (err, stack) {
-          return Center(child: Text('Error: $err'));
-        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
         data: (jobs) {
           final events = LinkedHashMap<DateTime, List<Job>>(
             equals: isSameDay,
             hashCode: getHashCode,
           )..addAll({
-            for (var job in jobs.where((job) => job.startDate != null)) // Filter jobs without start date
+            for (var job in jobs.where((job) => job.startDate != null))
               DateTime.utc(job.startDate!.year, job.startDate!.month, job.startDate!.day):
                   _getEventsForDay(job.startDate!, jobs)
           });
           
-          // Update selected events for the first build
           WidgetsBinding.instance.addPostFrameCallback((_) {
              if(mounted) {
                _selectedEvents.value = _getEventsForDay(_selectedDay!, jobs);
              }
           });
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                TableCalendar<Job>(
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(2030, 12, 31),
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  eventLoader: (day) => _getEventsForDay(day, jobs),
-                  onDaySelected: (selected, focused) => _onDaySelected(selected, focused, jobs),
-                  calendarStyle: CalendarStyle(
-                    todayDecoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                      shape: BoxShape.circle,
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                backgroundColor: Colors.white,
+                pinned: true,
+                elevation: 0.5,
+                title: Text(
+                  l10n.schedule,
+                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Container(
+                  color: Colors.white,
+                  child: TableCalendar<Job>(
+                    firstDay: DateTime.utc(2020, 1, 1),
+                    lastDay: DateTime.utc(2030, 12, 31),
+                    focusedDay: _focusedDay,
+                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                    eventLoader: (day) => events[day] ?? [],
+                    onDaySelected: (selected, focused) => _onDaySelected(selected, focused, jobs),
+                    headerStyle: const HeaderStyle(
+                      titleCentered: true,
+                      formatButtonVisible: false,
+                      titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
-                    selectedDecoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      shape: BoxShape.circle,
+                    calendarStyle: CalendarStyle(
+                      todayDecoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        shape: BoxShape.circle,
+                      ),
+                      selectedDecoration: const BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
+                       markerDecoration: const BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 8.0),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: jobs.length,
-                  itemBuilder: (context, index) {
-                    final job = jobs[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          child: Text(
-                              '${job.clientId?.firstName.substring(0, 1) ?? '?'}${job.clientId?.lastName.substring(0, 1) ?? ''}'),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              ValueListenableBuilder<List<Job>>(
+                valueListenable: _selectedEvents,
+                builder: (context, value, _) {
+                  if (value.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(48.0),
+                          child: Text('No appointments for this day.', style: TextStyle(color: Colors.grey.shade600)),
                         ),
-                        title: Text(job.serviceName),
-                        subtitle: Text(DateFormat.jm().format(job.createdAt)),
-                        trailing: Icon(
-                          job.status == 'COMPLETED'
-                              ? Icons.check_circle
-                              : job.status == 'PENDING'
-                                  ? Icons.pending
-                                  : Icons.arrow_forward_ios,
-                          color: job.status == 'COMPLETED'
-                              ? Colors.green
-                              : job.status == 'PENDING'
-                                  ? Colors.orange
-                                  : null,
-                        ),
-                        onTap: () => _showJobDetailsDialog(job),
                       ),
                     );
-                  },
-                ),
-              ],
-            ),
+                  }
+                  return SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final job = value[index];
+                           return _buildEventItem(job);
+                        },
+                        childCount: value.length,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildEventItem(Job job) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.grey.shade100,
+          child: Text(
+            '${job.clientId?.firstName.substring(0, 1) ?? '?'}${job.clientId?.lastName.substring(0, 1) ?? ''}',
+            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+        ),
+        title: Text(job.serviceName, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(DateFormat.jm().format(job.startDate ?? job.createdAt)),
+        trailing: Icon(
+          job.status == 'COMPLETED'
+              ? Icons.check_circle
+              : Icons.chevron_right,
+          color: job.status == 'COMPLETED'
+              ? Colors.black
+              : Colors.grey.shade400,
+        ),
+        onTap: () => _showJobDetailsDialog(job),
       ),
     );
   }

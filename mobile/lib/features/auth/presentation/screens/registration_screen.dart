@@ -35,17 +35,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   void _onRoleChanged(int index) {
     setState(() {
       _selectedRole = index;
-      _formKey.currentState?.reset();
-      _profilePhoto = null;
-      _idPhoto = null;
     });
   }
 
   Future<void> _getOtp() async {
     if (_formKey.currentState!.validate()) {
+      if (_selectedRole == 1 && _idPhoto == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please upload your ID photo.')), // This should be localized
+        );
+        return;
+      }
+      
       setState(() {
         _isLoading = true;
       });
+
       final phoneNumber = '+251' + _phoneController.text;
       final userData = {
         'firstName': _firstNameController.text,
@@ -58,26 +63,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       try {
         await _authService.requestOtp(phoneNumber);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                OtpScreen(phoneNumber: phoneNumber, userData: userData),
-          ),
-        );
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  OtpScreen(phoneNumber: phoneNumber, userData: userData),
+            ),
+          );
+        }
       } on AuthException catch (e) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)), // Using e.message which is user-friendly
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message)),
+          );
+        }
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
-
 
   @override
   void dispose() {
@@ -92,24 +101,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const SizedBox(height: 24),
                   Text(
                     l10n.welcome,
-                    style: TextStyle(
-                      fontSize: 32,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                      fontFamily: 'Noto Sans Ethiopic',
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.createYourAccount,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                   ),
                   const SizedBox(height: 32),
                   RoleToggleButton(
@@ -124,16 +139,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ..._buildProviderFields(l10n),
                   const SizedBox(height: 32),
                   AsymmetricButton(
-                    label: _isLoading ? l10n.sending : l10n.getOtp,
+                    label: _isLoading ? l10n.sending.toUpperCase() : l10n.getOtp,
                     onPressed: !_isLoading ? _getOtp : null,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()),
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => const LoginScreen(),
+                          transitionDuration: Duration.zero,
+                        ),
                       );
                     },
                     child: Center(
@@ -141,13 +158,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         text: TextSpan(
                           text: l10n.alreadyHaveAccount,
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
                           ),
                           children: [
                             TextSpan(
                               text: l10n.login,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),
                             ),
@@ -156,6 +175,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                     ),
                   ),
+                   const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -171,7 +191,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         child: PhotoUpload(
           label: l10n.profilePhoto,
           isRequired: false,
-          width: 150,
+          isCircular: true,
+          height: 120,
+          width: 120,
           onImageSelected: (file) {
             setState(() {
               _profilePhoto = file;
@@ -179,13 +201,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           },
         ),
       ),
+      const SizedBox(height: 24),
+      CustomTextField(
+          label: l10n.firstName, controller: _firstNameController, hintText: l10n.enterYourFirstName),
+      const SizedBox(height: 16),
+      CustomTextField(label: l10n.lastName, controller: _lastNameController, hintText: l10n.enterYourLastName),
       const SizedBox(height: 16),
       PhoneInput(controller: _phoneController, labelText: l10n.phone),
-      const SizedBox(height: 16),
-      CustomTextField(
-          label: l10n.firstName, controller: _firstNameController),
-      const SizedBox(height: 16),
-      CustomTextField(label: l10n.lastName, controller: _lastNameController),
       const SizedBox(height: 16),
       CustomTextField(
         label: l10n.pin,
@@ -193,6 +215,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         maxLength: 6,
         obscureText: true,
         controller: _pinController,
+        hintText: l10n.enter6DigitPIN,
       ),
     ];
   }
@@ -202,7 +225,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       Center(
         child: PhotoUpload(
           label: l10n.profilePhoto,
-          width: 150,
+          isCircular: true,
+          height: 120,
+          width: 120,
           onImageSelected: (file) {
             setState(() {
               _profilePhoto = file;
@@ -210,13 +235,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           },
         ),
       ),
+      const SizedBox(height: 24),
+      CustomTextField(
+          label: l10n.firstName, controller: _firstNameController, hintText: l10n.enterYourFirstName),
+      const SizedBox(height: 16),
+      CustomTextField(label: l10n.lastName, controller: _lastNameController, hintText: l10n.enterYourLastName),
       const SizedBox(height: 16),
       PhoneInput(controller: _phoneController, labelText: l10n.phone),
-      const SizedBox(height: 16),
-      CustomTextField(
-          label: l10n.firstName, controller: _firstNameController),
-      const SizedBox(height: 16),
-      CustomTextField(label: l10n.lastName, controller: _lastNameController),
       const SizedBox(height: 16),
       CustomTextField(
         label: l10n.pin,
@@ -224,11 +249,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         maxLength: 6,
         obscureText: true,
         controller: _pinController,
+        hintText: l10n.enter6DigitPIN,
       ),
-      const SizedBox(height: 16),
+      const SizedBox(height: 24),
       PhotoUpload(
         label: l10n.idUpload,
-        width: double.infinity,
         onImageSelected: (file) {
           setState(() {
             _idPhoto = file;

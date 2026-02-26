@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile/features/categories/domain/models/category.dart';
 import 'package:mobile/core/config.dart';
 import 'package:mobile/features/location/domain/providers/location_provider.dart';
 import 'package:mobile/features/providers/domain/models/provider.dart' as prov_model;
@@ -39,23 +38,25 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
     try {
       final fetchedProvider =
           await _providerService.getProvider(widget.providerId);
-      setState(() {
-        _provider = fetchedProvider;
-        _isLoading = false;
-        if (fetchedProvider.serviceCategories.isNotEmpty) {
-          // If a serviceName was passed, try to select it, otherwise default to the first
-          final initialService = fetchedProvider.serviceCategories.firstWhere(
-            (service) => service.category.name['en'] == widget.serviceName,
-            orElse: () => fetchedProvider.serviceCategories.first,
-          );
-          _selectedServiceId = initialService.category.id;
-        }
-      });
+      if (mounted) {
+        setState(() {
+          _provider = fetchedProvider;
+          _isLoading = false;
+          if (fetchedProvider.serviceCategories.isNotEmpty) {
+            final initialService = fetchedProvider.serviceCategories.firstWhere(
+              (service) => service.category.name['en'] == widget.serviceName,
+              orElse: () => fetchedProvider.serviceCategories.first,
+            );
+            _selectedServiceId = initialService.category.id;
+          }
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      // Handle error
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -70,6 +71,18 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
       context: context,
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.black, // header background color
+              onPrimary: Colors.white, // header text color
+              onSurface: Colors.black, // body text color
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != _selectedDateRange) {
       setState(() {
@@ -81,28 +94,41 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final currentPosition = ref.watch(currentPositionProvider);
     final locale = Localizations.localeOf(context).languageCode;
     
     final profilePhotoUrl = _provider?.user.profilePhoto;
     final fullImageUrl = (profilePhotoUrl != null && profilePhotoUrl.isNotEmpty)
         ? (profilePhotoUrl.startsWith('http') ? profilePhotoUrl : '$baseUrl$profilePhotoUrl')
-        : 'https://via.placeholder.com/400';
+        : null;
+
+    final providerName = _provider != null
+        ? '${_provider!.user.firstName} ${_provider!.user.lastName}'
+        : 'Loading...';
+    
+    final providerRole = _provider?.user.role ?? '';
 
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  expandedHeight: 200,
+                  expandedHeight: 250,
                   pinned: true,
+                  floating: false,
+                  backgroundColor: Colors.black,
+                  iconTheme: const IconThemeData(color: Colors.white),
                   flexibleSpace: FlexibleSpaceBar(
-                    background: Image.network(
-                      fullImageUrl,
-                      fit: BoxFit.cover,
-                    ),
+                    background: fullImageUrl != null 
+                        ? Image.network(
+                            fullImageUrl,
+                            fit: BoxFit.cover,
+                            color: Colors.black.withOpacity(0.4),
+                            colorBlendMode: BlendMode.darken,
+                          )
+                        : Container(color: Colors.grey.shade200),
                   ),
                   actions: [
                     IconButton(
@@ -117,49 +143,33 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Provider details...
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              backgroundImage: NetworkImage(fullImageUrl),
-                            ),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${_provider?.user.firstName ?? ''} ${_provider?.user.lastName ?? ''}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  "Provider", // This should be dynamic
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.call),
-                              color: Colors.blue,
-                            ),
-                          ],
+                        Text(
+                          providerName,
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
+                        const SizedBox(height: 4),
+                         Text(
+                          providerRole,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        const Divider(),
                         const SizedBox(height: 24),
 
                         // Service Selection
                         Text(
                           l10n.services,
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         if (_provider != null && _provider!.serviceCategories.isNotEmpty)
                           DropdownButtonFormField<String>(
                             value: _selectedServiceId,
@@ -174,26 +184,38 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                                 _selectedServiceId = value;
                               });
                             },
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
+                             decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: Colors.grey.shade300),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: Colors.grey.shade300),
+                              )
                             ),
                           ),
 
                         const SizedBox(height: 24),
                         // Issue Description
                         Text(
-                          "Describe your issue",
-                          style: Theme.of(context).textTheme.titleLarge,
+                          l10n.describeYourIssue,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         TextField(
                           controller: _descriptionController,
-                          maxLines: 3,
+                          maxLines: 4,
                           decoration: InputDecoration(
-                            hintText:
-                                "Enter a description of the problem...",
+                            hintText: l10n.enterDetailedDescription,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
                             ),
                           ),
                         ),
@@ -201,15 +223,23 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
 
                         // Date Range Selection
                         Text(
-                          "Preferred Dates",
-                          style: Theme.of(context).textTheme.titleLarge,
+                          l10n.preferredDates,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            side: BorderSide(color: Colors.grey.shade300)
+                          ),
                           onPressed: () => _selectDateRange(context),
-                          icon: const Icon(Icons.calendar_today),
+                          icon: const Icon(Icons.calendar_today, size: 20),
                           label: Text(_selectedDateRange == null
-                              ? "Select a date range"
+                              ? l10n.selectADateRange
                               : "${_selectedDateRange!.start.toLocal().toString().split(' ')[0]} - ${_selectedDateRange!.end.toLocal().toString().split(' ')[0]}"),
                         ),
                       ],
@@ -218,9 +248,22 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                 ),
               ],
             ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Colors.grey.shade200))
+        ),
         child: ElevatedButton(
+           style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
           onPressed: () {
             if (_provider != null &&
                 _descriptionController.text.isNotEmpty &&
@@ -228,11 +271,11 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                 _selectedServiceId != null) {
               
               final selectedService = _provider!.serviceCategories.firstWhere((service) => service.category.id == _selectedServiceId);
+              final currentPosition = ref.read(currentPositionProvider);
 
               final jobDetails = {
                 'providerId': widget.providerId,
-                'providerName':
-                    '${_provider!.user.firstName} ${_provider!.user.lastName}',
+                'providerName': providerName,
                 'profilePhoto': _provider!.user.profilePhoto,
                 'description': _descriptionController.text,
                 'startDate': _selectedDateRange!.start.toIso8601String(),
@@ -253,12 +296,12 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Please fill all fields before booking.')),
+                 SnackBar(
+                    content: Text(l10n.pleaseFillAllFields)),
               );
             }
           },
-          child: Text(l10n.bookNow),
+          child: Text(l10n.bookNow, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ),
       ),
     );

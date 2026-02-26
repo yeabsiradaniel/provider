@@ -46,7 +46,7 @@ const getConversations = async (user) => {
 
     const jobs = await Job.find({
         ...matchQuery,
-        status: { $in: ['PENDING', 'ACCEPTED', 'ACTIVE', 'COMPLETED'] }
+        status: { $in: ['PENDING', 'ACCEPTED', 'ACTIVE'] }
     })
     .populate('clientId', 'firstName lastName profilePhoto phone role')
     .populate('providerId', 'firstName lastName profilePhoto phone role')

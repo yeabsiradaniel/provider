@@ -31,7 +31,6 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
   void initState() {
     super.initState();
     if (widget.initialSelectedCategoryIds != null) {
-      log('[CategorySelectionScreen] Received initial IDs: ${widget.initialSelectedCategoryIds}');
       _selectedCategoryIds = widget.initialSelectedCategoryIds!;
     }
     _fetchCategories();
@@ -40,15 +39,19 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
   Future<void> _fetchCategories() async {
     try {
       final categories = await _categoryService.getCategories();
-      setState(() {
-        _categories = categories;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _categories = categories;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       log('Error fetching categories: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -61,15 +64,12 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
       if (user == null) return;
       
       final leafNodeIds = _getLeafNodes(_categories, _selectedCategoryIds);
-      // We only want to save the leaf nodes
       await _providerService.updateCategories(leafNodeIds.toList());
       
-      // After saving, refresh the provider profile to get the updated list
       await ref.read(providerProfileProvider(user.id).notifier).fetchProviderProfile();
       
       final leafNodeObjects = _getLeafCategoryObjects(_categories, _selectedCategoryIds);
 
-      // Navigate to the next step: Pricing
       if (mounted) {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -126,12 +126,7 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
     return leafNodes;
   }
 
-  void _navigateToDashboard() {
-    Navigator.of(context).pop();
-  }
-
   void _onCategorySelected(Category category, bool? isSelected) {
-    log('[CategorySelectionScreen] _onCategorySelected: ${category.name['en']}, isSelected: $isSelected');
     setState(() {
       if (isSelected == true) {
         _selectAllChildren(category, true);
@@ -160,12 +155,12 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
     final childrenStates = category.subCategories.map(_getCheckboxState).toSet();
 
     if (childrenStates.every((state) => state == true)) {
-      return true; // All children are selected
+      return true;
     }
     if (childrenStates.every((state) => state == false)) {
-      return false; // No children are selected
+      return false;
     }
-    return null; // Some children are selected (tristate)
+    return null;
   }
 
 
@@ -173,12 +168,12 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(l10n.selectYourServices),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _navigateToDashboard,
-        ),
+        title: Text(l10n.selectYourServices, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -189,12 +184,23 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
               },
             ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         child: ElevatedButton(
+           style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
           onPressed: _isSaving ? null : _saveSelection,
           child: _isSaving
-              ? const CircularProgressIndicator(color: Colors.white)
-              : Text(l10n.save),
+              ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                  )
+              : Text(l10n.save, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ),
       ),
     );
@@ -202,32 +208,61 @@ class _CategorySelectionScreenState extends ConsumerState<CategorySelectionScree
 
   Widget _buildCategoryTile(Category category, {int depth = 0}) {
     final locale = Localizations.localeOf(context).languageCode;
+    final title = category.name[locale] ?? category.name['en']!;
     
     if (category.subCategories.isEmpty) {
-      // Leaf node
       return Padding(
         padding: EdgeInsets.only(left: 16.0 * depth),
-        child: CheckboxListTile(
-          title: Text(category.name[locale] ?? category.name['en']!),
-          value: _selectedCategoryIds.contains(category.id),
-          onChanged: (bool? value) {
-            _onCategorySelected(category, value);
-          },
+        child: Theme(
+          data: ThemeData(
+            unselectedWidgetColor: Colors.black,
+          ),
+          child: CheckboxListTile(
+            activeColor: Colors.black,
+            checkColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+            title: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            value: _selectedCategoryIds.contains(category.id),
+            onChanged: (bool? value) {
+              _onCategorySelected(category, value);
+            },
+            controlAffinity: ListTileControlAffinity.trailing,
+          ),
         ),
       );
     }
 
-    // Parent node
-    return Padding(
-      padding: EdgeInsets.only(left: 16.0 * depth),
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
-        title: Text(category.name[locale] ?? category.name['en']!),
-        leading: Checkbox(
-          value: _getCheckboxState(category),
-          tristate: true,
-          onChanged: (bool? value) {
-            _onCategorySelected(category, value ?? false);
-          },
+        tilePadding: EdgeInsets.only(left: 24 + (16.0 * depth), right: 24),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        leading: SizedBox(
+          width: 24,
+          height: 24,
+          child: Checkbox(
+            activeColor: Colors.black,
+            checkColor: Colors.white,
+            value: _getCheckboxState(category),
+            tristate: true,
+            onChanged: (bool? value) {
+              _onCategorySelected(category, value ?? false);
+            },
+          ),
         ),
         children: category.subCategories
             .map((sub) => _buildCategoryTile(sub, depth: depth + 1))

@@ -215,304 +215,174 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
     final currentPosition = ref.watch(currentPositionProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
+        backgroundColor: Theme.of(context).colorScheme.background,
+        body: userAsyncValue.when(
+          data: (user) {
+            if (user == null) {
+              return const Center(
+                  child: Text('User not found. Please restart the app.'));
+            }
+            return CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  pinned: false,
+                  snap: false,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  title: Row(
+                    children: [
+                      const Icon(Icons.location_on, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        currentPosition != null
+                            ? '${currentPosition.latitude.toStringAsFixed(2)}, ${currentPosition.longitude.toStringAsFixed(2)}'
+                            : l10n.boleAddisAbaba,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x08000000),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_none),
+                      onPressed: () {},
                     ),
                   ],
                 ),
-                child: userAsyncValue.when(
-                  data: (user) {
-                    if (user == null) {
-                      return const Center(
-                          child:
-                              Text('User not found. Please restart the app.'));
-                    }
-                    return Column(
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                ProfileAvatar(
-                                  imageUrl: user.profilePhoto ?? '',
-                                  radius: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.location_on,
-                                            size: 14,
-                                            color: Theme.of(context).textTheme.bodySmall?.color),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          currentPosition != null
-                                              ? '${currentPosition.latitude.toStringAsFixed(2)}, ${currentPosition.longitude.toStringAsFixed(2)}'
-                                              : l10n.boleAddisAbaba,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 1.5,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.color,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      l10n.helloUser(user.firstName),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.color,
-                                      ),
-                                    ),
-                                  ],
+                        TextField(
+                          controller: _searchController,
+                          onChanged: _onSearchChanged,
+                          decoration: InputDecoration(
+                            hintText: l10n.searchForServicesAndPackages,
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_isSearching)
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator(),
+                          )
+                        else if (_searchResults.isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x08000000),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
                                 ),
                               ],
                             ),
-                            Icon(
-                              Icons.notifications,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        Column(
-                          children: [
-                            TextField(
-                              controller: _searchController,
-                              onChanged: _onSearchChanged,
-                              onSubmitted: _performSearch,
-                              decoration: InputDecoration(
-                                hintText: l10n.searchForExperts,
-                                prefixIcon: const Icon(Icons.search),
-                                prefixIconColor: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.color,
-                                filled: true,
-                                fillColor: Theme.of(context)
-                                    .scaffoldBackgroundColor,
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(16),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            if (_isSearching)
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(),
-                              )
-                            else if (_searchResults.isNotEmpty)
-                              Container(
-                                margin:
-                                    const EdgeInsets.only(top: 8),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius:
-                                      BorderRadius.circular(16),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x08000000),
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                constraints: BoxConstraints(
-                                    maxHeight:
-                                        MediaQuery.of(context).size.height *
-                                            0.3),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: _searchResults.length,
-                                  itemBuilder: (context, index) {
-                                    final result =
-                                        _searchResults[index];
-                                    return ListTile(
-                                      title: Text(result.name),
-                                      subtitle: Text(result.type),
-                                      onTap: () =>
-                                          _handleSearchSelection(result),
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (err, stack) =>
-                      const Center(child: Text('Error loading profile.')),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          l10n.categories,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.color,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _showAllCategories = !_showAllCategories;
-                            });
-                          },
-                          child: Text(
-                            _showAllCategories ? "See Less" : l10n.seeAll,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              color: Theme.of(context).colorScheme.primary,
-                              letterSpacing: 1.5,
+                            constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.height * 0.3),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: _searchResults.length,
+                              itemBuilder: (context, index) {
+                                final result = _searchResults[index];
+                                return ListTile(
+                                  title: Text(result.name),
+                                  subtitle: Text(result.type),
+                                  onTap: () => _handleSearchSelection(result),
+                                );
+                              },
                             ),
                           ),
-                        ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    _isLoadingCategories
-                        ? const Center(child: CircularProgressIndicator())
-                        : AnimatedSize(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            child: Column(
-                              children: [
-                                for (int i = 0;
-                                    i <
-                                        (_showAllCategories
-                                            ? _categories.length
-                                            : (_categories.length > 4
-                                                ? 4
-                                                : _categories.length));
-                                    i += 4)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        for (int j = i;
-                                            j < i + 4 &&
-                                                j < _categories.length;
-                                            j++)
-                                          _buildCategoryItem(
-                                            context,
-                                            _categories[j],
-                                            bgColor: _getCategoryBgColor(j),
-                                            iconColor:
-                                                _getCategoryIconColor(j),
-                                          ),
-                                        for (int k = 0;
-                                            k <
-                                                (4 -
-                                                    (_categories.length - i)
-                                                        .clamp(0, 4));
-                                            k++)
-                                          const SizedBox(width: 64),
-                                      ],
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      child: DiscountCard(
-                        color: const Color(0xFF1E293B),
-                        height: 150,
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.grey.shade200,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                l10n.discountOff(200),
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                '${l10n.on} ${l10n.electricians}',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              Text(l10n.cleaningServices,
+                                  style:
+                                      TextStyle(color: Colors.grey.shade600)),
                               const SizedBox(height: 8),
-                              Text(
-                                l10n.limitedTime.toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  color: Color(0xFF94A3B8),
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
+                              Text(l10n.qualityWorkAffordablePrice,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 8),
+                              Text(l10n.weBringProfessionalCleaningServices,
+                                  style:
+                                      TextStyle(color: Colors.grey.shade600)),
                             ],
                           ),
                         ),
-                      ),
+                        const SizedBox(width: 16),
+                        // You can replace this with an actual image
+                        Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey,
+                        )
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                _isLoadingCategories
+                    ? const SliverToBoxAdapter(
+                        child: Center(child: CircularProgressIndicator()))
+                    : SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: 0.8,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return _buildCategoryItem(
+                                  context, _categories[index],
+                                  bgColor: Colors.white,
+                                  iconColor: Colors.black);
+                            },
+                            childCount: _categories.length,
+                          ),
+                        ),
+                      ),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) =>
+              const Center(child: Text('Error loading profile.')),
+        ));
   }
 
   Color _getCategoryBgColor(int index) {
@@ -578,37 +448,32 @@ class _ClientHomeContentState extends ConsumerState<ClientHomeContent> {
           ),
         );
       },
-      child: SizedBox(
-        width: 70,
-        child: Column(
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                getIconData(category.icon),
-                color: iconColor,
-                size: 32,
-              ),
+      child: Column(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(height: 8),
-            Text(
-              category.name[Localizations.localeOf(context).languageCode] ?? category.name['en']!,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
+            child: Icon(
+              getIconData(category.icon),
+              size: 40,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            category.name[Localizations.localeOf(context).languageCode] ?? category.name['en']!,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

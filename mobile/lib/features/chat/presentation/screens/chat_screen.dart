@@ -19,6 +19,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ChatService _chatService = ChatService();
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   
   List<Message> _messages = [];
   bool _isLoading = true;
@@ -26,28 +27,38 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    log('--- [LOG] ChatScreen: initState ---');
     _fetchMessages();
     
-    log('--- [LOG] ChatScreen: Setting up socket listeners... ---');
     final socketService = ref.read(socketServiceProvider);
     socketService.joinJobRoom(widget.job.id);
     socketService.listenForMessages((data) {
-       log('--- [LOG] ChatScreen: Message received from socket. ---');
        final message = Message.fromJson(data);
        if (mounted) {
         setState(() {
           _messages.add(message);
         });
+        _scrollToBottom();
       }
     });
-     log('--- [LOG] ChatScreen: Socket listeners set up. ---');
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   Future<void> _fetchMessages() async {
@@ -58,6 +69,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           _messages = messages;
           _isLoading = false;
         });
+        _scrollToBottom();
       }
     } catch (e) {
       log('Error fetching messages: $e');
@@ -70,12 +82,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Future<void> _sendMessage() async {
-    if (_messageController.text.isEmpty) return;
+    if (_messageController.text.trim().isEmpty) return;
 
     final user = ref.read(userProvider).value;
     if (user == null) return;
 
-    // The receiver is the other person in the job
     final receiverId = user.id == widget.job.clientId?.id
         ? widget.job.providerId?.id
         : widget.job.clientId?.id;
@@ -89,16 +100,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       'jobId': widget.job.id,
       'senderId': user.id,
       'receiverId': receiverId,
-      'text': _messageController.text,
+      'text': _messageController.text.trim(),
     };
 
-    // Only send the message via the socket.
-    // The backend will save it and broadcast it back to everyone in the room,
-    // including the sender. The `listenForMessages` handler will then update the UI.
-    log('--- [LOG] ChatScreen: Emitting sendMessage via socket. ---');
     ref.read(socketServiceProvider).sendMessage(messageData);
-
-    // Clear the input field immediately.
     _messageController.clear();
   }
 
@@ -106,9 +111,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentUser = ref.watch(userProvider).value;
+    
+    final otherUser = currentUser?.id == widget.job.clientId?.id
+        ? widget.job.providerId
+        : widget.job.clientId;
+    
+    final chatTitle = otherUser != null ? '${otherUser.firstName} ${otherUser.lastName}' : 'Chat';
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Chat with Provider'),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text(
+          chatTitle,
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.call_outlined)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+        ],
       ),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
@@ -116,6 +139,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           children: [
             Expanded(
               child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(16),
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
                   final message = _messages[index];
@@ -141,15 +166,23 @@ class _MessageBubble extends StatelessWidget {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isMe ? Theme.of(context).colorScheme.primary : Colors.grey[300],
-          borderRadius: BorderRadius.circular(12),
+          color: isMe ? Colors.black : Colors.grey.shade200,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(0),
+            bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(16),
+          )
         ),
         child: Text(
           text,
-          style: TextStyle(color: isMe ? Colors.white : Colors.black),
+          style: TextStyle(
+            color: isMe ? Colors.white : Colors.black,
+            fontSize: 15,
+          ),
         ),
       ),
     );
@@ -165,19 +198,36 @@ class _MessageInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Colors.grey.shade200))
+      ),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: controller,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Type a message...',
-                border: OutlineInputBorder(),
+                fillColor: Colors.grey.shade100,
+                filled: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
+              onSubmitted: (_) => onSend(),
             ),
           ),
+          const SizedBox(width: 12),
           IconButton(
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.all(12),
+            ),
             icon: const Icon(Icons.send),
             onPressed: onSend,
           ),

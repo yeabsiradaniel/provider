@@ -9,6 +9,8 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool obscureText;
   final FormFieldValidator<String>? customValidator;
+  final String? hintText;
+  final Widget? prefixIcon;
 
   const CustomTextField({
     Key? key,
@@ -19,44 +21,64 @@ class CustomTextField extends StatelessWidget {
     this.maxLength,
     this.obscureText = false,
     this.customValidator,
+    this.hintText,
+    this.prefixIcon,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-      maxLength: maxLength,
-      obscureText: obscureText,
-      validator: (value) {
-        if (isRequired && (value == null || value.isEmpty)) {
-          return AppLocalizations.of(context)!.fieldRequired;
-        }
-        if (maxLength != null && value!.length != maxLength) {
-          return AppLocalizations.of(context)!.pinMustBe6Digits;
-        }
-        if (customValidator != null) {
-          return customValidator!(value);
-        }
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0xFFE2E8F0),
-            width: 2,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade600,
+            letterSpacing: 0.8,
           ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0xFFE2E8F0),
-            width: 2,
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+          maxLength: maxLength,
+          obscureText: obscureText,
+          validator: (value) {
+            final l10n = AppLocalizations.of(context)!;
+            if (isRequired && (value == null || value.isEmpty)) {
+              return l10n.fieldRequired;
+            }
+            // Adjusted to be more generic, specific message can be passed via customValidator
+            if (maxLength != null && value != null && value.length != maxLength) {
+              return l10n.mustBeNdigits(maxLength!);
+            }
+            if (customValidator != null) {
+              return customValidator!(value);
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            hintText: hintText,
+            prefixIcon: prefixIcon,
+            counterText: "", // Hides the maxLength counter
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.black, width: 1.5),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

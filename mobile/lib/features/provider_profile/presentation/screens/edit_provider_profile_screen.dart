@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/core/widgets/profile_avatar.dart';
+import 'package:mobile/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:mobile/features/provider_dashboard/presentation/screens/category_selection_screen.dart';
 import 'package:mobile/features/provider_profile/domain/providers/provider_profile_provider.dart';
 import 'package:mobile/features/user/domain/models/user.dart';
@@ -118,66 +119,76 @@ class _EditProviderProfileScreenState
     final providerProfile = ref.watch(providerProfileProvider(user.id)).value;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(l10n.editProfile),
+        title: Text(l10n.editProfile, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+         backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Form(
                 key: _formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (_profileImage != null)
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage: FileImage(_profileImage!),
-                      )
-                    else
-                      ProfileAvatar(
-                        imageUrl: user.profilePhoto ?? '',
-                        radius: 60,
+                    Center(
+                      child: Stack(
+                        children: [
+                           if (_profileImage != null)
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundImage: FileImage(_profileImage!),
+                              )
+                            else
+                              ProfileAvatar(
+                                imageUrl: user.profilePhoto ?? '',
+                                radius: 50,
+                              ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: _pickImage,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle
+                                ),
+                                child: const Icon(Icons.edit, color: Colors.white, size: 16),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: _pickImage,
-                      child: Text(l10n.changeProfilePhoto),
                     ),
-                    const SizedBox(height: 32),
-                    TextFormField(
+                    const SizedBox(height: 48),
+                    CustomTextField(
+                      label: l10n.firstName,
                       controller: _firstNameController,
-                      decoration: InputDecoration(labelText: l10n.firstName),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.fieldRequired;
-                        }
-                        return null;
-                      },
+                      hintText: l10n.enterYourFirstName,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                     CustomTextField(
+                      label: l10n.lastName,
                       controller: _lastNameController,
-                      decoration: InputDecoration(labelText: l10n.lastName),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.fieldRequired;
-                        }
-                        return null;
-                      },
+                      hintText: l10n.enterYourLastName,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                     CustomTextField(
+                      label: l10n.phone,
                       controller: _phoneController,
-                      decoration: InputDecoration(labelText: l10n.phone),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.fieldRequired;
-                        }
-                        return null;
-                      },
+                      isNumeric: true,
                     ),
                     const SizedBox(height: 24),
+                    const Divider(),
+                     const SizedBox(height: 16),
                     ListTile(
-                      title: Text(l10n.services),
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.miscellaneous_services_outlined, color: Colors.black),
+                      title: Text(l10n.services, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
                       trailing: const Icon(Icons.chevron_right),
                       enabled: providerProfile != null,
                       onTap: () async {
@@ -194,17 +205,33 @@ class _EditProviderProfileScreenState
                         }
                       },
                     ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _updateProfile,
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(l10n.updateProfile),
-                    ),
                   ],
                 ),
               ),
             ),
+       bottomNavigationBar: Padding(
+         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+         child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
+            onPressed: _isLoading ? null : _updateProfile,
+            child: _isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                  )
+                : Text(
+                    l10n.updateProfile,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+          ),
+       ),
     );
   }
 }

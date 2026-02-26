@@ -17,19 +17,14 @@ class SplashScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    'assets/images/Asset 1.png',
+                    'assets/images/Asset 1.png', // This is the original logo
                     width: 96,
                     height: 96,
                   ),
-                  const SizedBox(height: 32),
-                  Text(
-                    AppLocalizations.of(context)!.splashTitle,
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
-                      fontFamily: 'Noto Sans Ethiopic'
-                    ),
+                  const SizedBox(height: 24),
+                  Image.asset(
+                    'assets/images/app_name.png', // This is the new "FIXADDIS" logo
+                    width: 160,
                   ),
                   const SizedBox(height: 16),
                   Text(

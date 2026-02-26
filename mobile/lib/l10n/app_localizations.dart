@@ -149,7 +149,7 @@ abstract class AppLocalizations {
   /// No description provided for @splashSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'A premium marketplace that connects customers and service providers.'**
+  /// **'WE CONNECT CLIENTS WITH HONEST AND EXCLUSIVE SERVICE PROVIDERS.'**
   String get splashSubtitle;
 
   /// No description provided for @welcome.
@@ -431,7 +431,7 @@ abstract class AppLocalizations {
   /// No description provided for @boleAddisAbaba.
   ///
   /// In en, this message translates to:
-  /// **'Bole, Addis Ababa'**
+  /// **'Location loading...'**
   String get boleAddisAbaba;
 
   /// No description provided for @discountOff.
@@ -877,6 +877,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submit Payment & Review'**
   String get submitPaymentAndReview;
+
+  /// No description provided for @searchForServicesAndPackages.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for services and packages'**
+  String get searchForServicesAndPackages;
+
+  /// No description provided for @cleaningServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning Services'**
+  String get cleaningServices;
+
+  /// No description provided for @qualityWorkAffordablePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality Work with\nAffordable Price'**
+  String get qualityWorkAffordablePrice;
+
+  /// No description provided for @weBringProfessionalCleaningServices.
+  ///
+  /// In en, this message translates to:
+  /// **'We bring professional cleaning services right to your home'**
+  String get weBringProfessionalCleaningServices;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back!'**
+  String get welcomeBack;
+
+  /// No description provided for @loginToYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Login to your account'**
+  String get loginToYourAccount;
+
+  /// No description provided for @createYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account'**
+  String get createYourAccount;
+
+  /// No description provided for @photoLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo Library'**
+  String get photoLibrary;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @mustBeNdigits.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be {maxLength} digits'**
+  String mustBeNdigits(int maxLength);
+
+  /// No description provided for @describeYourIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your issue'**
+  String get describeYourIssue;
+
+  /// No description provided for @preferredDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Dates'**
+  String get preferredDates;
+
+  /// No description provided for @selectADateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a date range'**
+  String get selectADateRange;
+
+  /// No description provided for @pleaseFillAllFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill all fields before booking.'**
+  String get pleaseFillAllFields;
+
+  /// No description provided for @summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get summary;
+
+  /// No description provided for @dates.
+  ///
+  /// In en, this message translates to:
+  /// **'Dates'**
+  String get dates;
+
+  /// No description provided for @requestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Sent!'**
+  String get requestSent;
+
+  /// No description provided for @providerNotified.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider has been notified. You can view the status of your request in the bookings tab.'**
+  String get providerNotified;
+
+  /// No description provided for @backToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Home'**
+  String get backToHome;
+
+  /// No description provided for @enterDetailedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a detailed description...'**
+  String get enterDetailedDescription;
+
+  /// No description provided for @enter6DigitPIN.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 6-digit PIN'**
+  String get enter6DigitPIN;
+
+  /// No description provided for @enterYourFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your first name'**
+  String get enterYourFirstName;
+
+  /// No description provided for @enterYourLastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your last name'**
+  String get enterYourLastName;
+
+  /// No description provided for @providerAgreementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FIXADDIS SERVICE PROVIDER AGREEMENT'**
+  String get providerAgreementTitle;
+
+  /// No description provided for @iAgreeToTheTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the terms and conditions'**
+  String get iAgreeToTheTerms;
+
+  /// No description provided for @providerAgreementText.
+  ///
+  /// In en, this message translates to:
+  /// **'(Independent Contractor Agreement)\nThis Agreement is entered into between:\nFIXADDIS (“Platform”)\nand\nThe registered Service Provider (“Provider”).\n\nBy signing or using the Platform, the Provider agrees to the following:\n\n1️⃣ Relationship\n\n1.1 The Provider is an independent contractor, not an employee, partner, or agent of FixAddis.\n1.2 The Provider is responsible for all taxes, permits, tools, transport, insurance (if applicable), and operational costs.\n1.3 FixAddis acts only as a digital marketplace connecting customers and Providers.\n\n2️⃣ Scope of Services\n\nThe Provider may offer services including but not limited to:\nRoadside mechanic services\nHome repair (plumbing, electrical, carpentry, etc.)\nAppliance repair\nCleaning services\nInstallation services\nAny other approved skilled service listed on the Platform\nProviders may only perform services they are qualified to perform.\n\n3️⃣ Verification & Eligibility\n\nPlatform confirms:\nValid identification submitted\nAccurate personal and contact details\nSufficient skill and experience\nAny legally required licenses\nLegal eligibility of provider to provide services in Ethiopia\nProviding false information results in immediate termination.\n\n4️⃣ Professional Conduct & Discipline \n\nProvider agrees to:\nTreat customers respectfully\nClearly explain pricing before starting work\nObtain customer approval before additional charges\nArrive within reasonable time\nMaintain professional appearance and behaviour \n\nProvider shall NOT:\n\nHarass, threaten, or intimidate customers\nOvercharge or manipulate pricing unfairly\nPerform services under alcohol or drug influence\nEngage in discrimination\nDemand payment beyond agreed amount\nMisrepresent FIXADDIS\nSerious violations result in immediate termination.\n\n5️⃣ Safety Obligations\n\nProvider is fully responsible for:\n\nSafe work practices\nUse of proper tools\nRoadside and site safety\nAvoiding damage to property\nCompliance with traffic and safety laws\n\nFixAddis is not liable for:\n\nInjuries\nProperty damage\nMechanical failure\nWork defects caused by Provider negligence\nProvider assumes full legal responsibility for services performed.\n\n6️⃣ Pricing & Commission\n\n6.1 Provider agrees to follow platform pricing guidelines.\n6.2 Final price must be agreed before work begins.\n6.3 Provider agrees to pay agreed commission or platform fees.\n6.4 Failure to pay commission may result in suspension and legal recovery.\n\n7️⃣ Anti-Bypass Clause\n\nProvider agrees:\nNot to solicit customers outside the Platform\nNot to share personal contact details for future direct jobs\nNot to intentionally avoid commission\nViolation may result in permanent removal and financial penalty.\n\n8️⃣ Ratings & Performance Monitoring\n\nFIXADDIS may monitor:\n\nCustomer ratings\nResponse time\nComplaint frequency\nJob completion rate\nPrice fairness\n\nProviders with repeated low performance may face:\n\nWarning\nTemporary suspension\nPermanent termination.\n\n9️⃣ Customer Complaints & Refunds\n\nProvider agrees to:\n\nCooperate with investigations\nRespond within 48 hours\nAccept fair dispute resolution\nFIXADDIS may require refunds in cases of proven misconduct.\n\n1️⃣0️⃣ Suspension & Termination\n\nFixAddis may immediately suspend or terminate access for:\n\nSafety violations\nFraud\nHarassment\nCriminal conduct\nRepeated poor ratings\nCommission evasion\nNo notice required in serious cases.\n\n1️⃣1️⃣ confidenciality\n\nProvider agrees not to disclose:\nCustomer data\nInternal policies\nPricing structures\nPlatform operational information.\n\n1️⃣2️⃣ Amendments\n\nFixAddis may update this Agreement at any time.\nContinued platform use indicates acceptance.'**
+  String get providerAgreementText;
 }
 
 class _AppLocalizationsDelegate

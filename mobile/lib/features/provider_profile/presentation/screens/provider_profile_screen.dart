@@ -14,29 +14,15 @@ class ProviderProfileScreen extends ConsumerWidget {
   const ProviderProfileScreen({Key? key}) : super(key: key);
 
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
-    log('===== PROVIDER LOGOUT START =====');
-    try {
-      log('[Logout] 1. Clearing user from userProvider...');
-      ref.read(userProvider.notifier).clearUser();
-      log('[Logout] 2. User cleared.');
+    ref.read(userProvider.notifier).clearUser();
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
 
-      log('[Logout] 3. Clearing SharedPreferences...');
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
-      log('[Logout] 4. SharedPreferences cleared.');
-
-      log('[Logout] 5. Navigating to RegistrationScreen...');
-      if (context.mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const RegistrationScreen()),
-          (Route<dynamic> route) => false,
-        );
-      }
-      log('[Logout] 6. Navigation complete.');
-    } catch (e, stack) {
-      log('[Logout] ERROR during logout process!', error: e, stackTrace: stack);
-    }
-    log('===== PROVIDER LOGOUT END =====');
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const RegistrationScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override
@@ -45,81 +31,103 @@ class ProviderProfileScreen extends ConsumerWidget {
     final userAsyncValue = ref.watch(userProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.profile),
-      ),
+      backgroundColor: Colors.grey.shade50,
       body: userAsyncValue.when(
         data: (user) {
           if (user == null) {
-            return Center(child: Text(l10n.genericError));
+            return const Center(child: Text('Not logged in.'));
           }
-          return ListView(
-            children: [
-              const SizedBox(height: 24),
-              ProfileAvatar(
-                imageUrl: user.profilePhoto ?? '',
-                radius: 50,
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  '${user.firstName} ${user.lastName}',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                backgroundColor: Colors.white,
+                pinned: true,
+                elevation: 0.5,
+                title: Text(
+                  l10n.profile,
+                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 32),
-              _buildProfileMenuItem(
-                context,
-                icon: Icons.person_outline,
-                text: l10n.editProfile,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const EditProviderProfileScreen()),
-                  );
-                },
-              ),
-              _buildProfileMenuItem(
-                context,
-                icon: Icons.miscellaneous_services_outlined,
-                text: l10n.availabilitySettings,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AvailabilitySettingsScreen(),
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    ProfileAvatar(
+                      imageUrl: user.profilePhoto ?? '',
+                      radius: 50,
                     ),
-                  );
-                },
-              ),
-              _buildProfileMenuItem(
-                context,
-                icon: Icons.history_outlined,
-                text: l10n.serviceHistory,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ServiceHistoryScreen(),
+                    const SizedBox(height: 16),
+                    Text(
+                      '${user.firstName} ${user.lastName}',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                  );
-                },
-              ),
-              _buildProfileMenuItem(
-                context,
-                icon: Icons.logout_outlined,
-                text: l10n.logout,
-                onTap: () => _logout(context, ref),
+                    Text(
+                      user.role.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    _buildProfileMenuItem(
+                      context,
+                      icon: Icons.person_outline,
+                      text: l10n.editProfile,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const EditProviderProfileScreen()),
+                        );
+                      },
+                    ),
+                    _buildProfileMenuItem(
+                      context,
+                      icon: Icons.miscellaneous_services_outlined,
+                      text: l10n.availabilitySettings,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AvailabilitySettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildProfileMenuItem(
+                      context,
+                      icon: Icons.history_outlined,
+                      text: l10n.serviceHistory,
+                      onTap: () {
+                         Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ServiceHistoryScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildProfileMenuItem(
+                      context,
+                      icon: Icons.logout_outlined,
+                      text: l10n.logout,
+                      isDestructive: true,
+                      onTap: () => _logout(context, ref),
+                    ),
+                  ],
+                ),
               ),
             ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text(err.toString())),
+        error: (err, stack) => const Center(child: Text('Error loading profile.')),
       ),
     );
   }
@@ -129,12 +137,44 @@ class ProviderProfileScreen extends ConsumerWidget {
     required IconData icon,
     required String text,
     required VoidCallback onTap,
+    bool isDestructive = false,
   }) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(text),
-      trailing: const Icon(Icons.chevron_right),
+    return InkWell(
       onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+           color: Colors.white,
+           borderRadius: BorderRadius.circular(12),
+           border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 22,
+              color: isDestructive ? Colors.red : Colors.black,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isDestructive ? Colors.red : Colors.black,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: 18,
+              color: Colors.grey.shade400,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

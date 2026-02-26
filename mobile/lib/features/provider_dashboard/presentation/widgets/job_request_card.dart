@@ -16,18 +16,21 @@ class JobRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
         ),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              backgroundColor: Colors.grey.shade100,
+              foregroundColor: Colors.black,
               child: Text(
                 initials,
                 style: const TextStyle(
@@ -36,21 +39,28 @@ class JobRequestCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  details,
-                  style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    details,
+                    style: TextStyle(color: Colors.grey.shade600),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-            const Spacer(),
-            const Icon(Icons.arrow_forward_ios),
+            const SizedBox(width: 16),
+            Icon(Icons.chevron_right, color: Colors.grey.shade400),
           ],
         ),
       ),

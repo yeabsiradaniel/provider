@@ -19,14 +19,14 @@ class LanguageCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE0EFFF) : Colors.transparent,
+          color: isSelected ? Colors.grey.shade100 : Colors.white,
           border: Border.all(
-            color: isSelected ? const Color(0xFF0056B3) : const Color(0xFFE2E8F0),
-            width: 2,
+            color: isSelected ? Colors.black : Colors.grey.shade300,
+            width: 1.5,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -39,7 +39,7 @@ class LanguageCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isSelected ? const Color(0xFF1E293B) : const Color(0xFF475569),
+                    color: Colors.black,
                     fontFamily: language == 'አማርኛ' ? 'Noto Sans Ethiopic' : 'Plus Jakarta Sans',
                   ),
                 ),
@@ -47,18 +47,26 @@ class LanguageCard extends StatelessWidget {
                 Text(
                   status,
                   style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? const Color(0xFF0056B3) : const Color(0xFF94A3B8),
-                    letterSpacing: 1.5,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],
             ),
             if (isSelected)
-              const Icon(
-                Icons.check_circle,
-                color: Color(0xFF0056B3),
+              Container(
+                width: 24,
+                height: 24,
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 16,
+                ),
               ),
           ],
         ),

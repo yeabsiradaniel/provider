@@ -37,9 +37,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeProvider);
+    final List<Widget> onboardingPages = [
+      const SplashScreen(),
+      LanguageSelectionScreen(
+        onLanguageSelected: (String lang) {
+          _saveSelectedLanguage(lang == 'አማርኛ' ? 'am' : 'en');
+        },
+        selectedLanguage: locale.languageCode == 'am' ? 'አማርኛ' : 'English',
+      ),
+    ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           PageView(
@@ -49,34 +58,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 _currentPage = page;
               });
             },
-            children: [
-              const SplashScreen(),
-              LanguageSelectionScreen(
-                onLanguageSelected: (String lang) {
-                  _saveSelectedLanguage(lang == 'አማርኛ' ? 'am' : 'en');
-                },
-                selectedLanguage: locale.languageCode == 'am' ? 'አማርኛ' : 'English',
-              ),
-            ],
+            children: onboardingPages,
           ),
           Positioned(
-            bottom: 48,
+            bottom: 120,
             left: 0,
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                2,
+                onboardingPages.length,
                 (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
-                  height: 4,
-                  width: _currentPage == index ? 48 : 16,
+                  height: 8,
+                  width: _currentPage == index ? 24 : 8,
                   decoration: BoxDecoration(
                     color: _currentPage == index
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).disabledColor,
-                    borderRadius: BorderRadius.circular(2),
+                        ? Colors.black
+                        : Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),

@@ -28,7 +28,6 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
   bool _isSubmitting = false;
 
   Future<void> _submitReviewAndPayment() async {
-    // Validate the form
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -48,12 +47,10 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
         providerId: widget.providerId,
         rating: _rating,
         paidAmount: paidAmount,
-        // comment is now optional
       );
 
       log('Review and payment submitted for job ${widget.jobId}');
 
-      // Refresh both customer and provider data
       ref.refresh(customerBookingsProvider);
       ref.refresh(providerEarningsProvider);
 
@@ -89,85 +86,119 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(l10n.rateAndPay),
+        title: Text(
+          l10n.rateAndPay,
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.howWasYourService,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 24),
-                    Center(
-                      child: RatingBar.builder(
-                        initialRating: _rating,
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        itemCount: 5,
-                        itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        itemBuilder: (context, _) =>
-                            const Icon(Icons.star, color: Colors.amber),
-                        onRatingUpdate: (rating) {
-                          setState(() {
-                            _rating = rating;
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    TextFormField(
-                      controller: _paymentController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                      ],
-                      decoration: InputDecoration(
-                        labelText: l10n.amountPaid,
-                        hintText: '0.00',
-                        prefixIcon: const Icon(Icons.attach_money),
-                        border: const OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.pleaseEnterAmount;
-                        }
-                        if (double.tryParse(value) == null) {
-                          return l10n.pleaseEnterValidNumber;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      onPressed: _isSubmitting ? null : _submitReviewAndPayment,
-                      child: _isSubmitting
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(l10n.submitPaymentAndReview),
-                    ),
-                  ],
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 24),
+              Text(
+                l10n.howWasYourService,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
+              const SizedBox(height: 24),
+              Center(
+                child: RatingBar.builder(
+                  initialRating: _rating,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  itemCount: 5,
+                  itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  itemBuilder: (context, _) =>
+                      const Icon(Icons.star, color: Colors.black),
+                  onRatingUpdate: (rating) {
+                    setState(() {
+                      _rating = rating;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 48),
+              Text(
+                l10n.amountPaid.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade600,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _paymentController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+                decoration: InputDecoration(
+                  hintText: '0.00',
+                  prefixText: 'ETB ',
+                  prefixStyle: const TextStyle(color: Colors.black),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                   focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return l10n.pleaseEnterAmount;
+                  }
+                  if (double.tryParse(value) == null) {
+                    return l10n.pleaseEnterValidNumber;
+                  }
+                  return null;
+                },
+              ),
+            ],
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 0,
+          ),
+          onPressed: _isSubmitting ? null : _submitReviewAndPayment,
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                )
+              : Text(
+                  l10n.submitPaymentAndReview,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
         ),
       ),
     );

@@ -34,7 +34,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get splashSubtitle =>
-      'A premium marketplace that connects customers and service providers.';
+      'WE CONNECT CLIENTS WITH HONEST AND EXCLUSIVE SERVICE PROVIDERS.';
 
   @override
   String get welcome => 'Welcome';
@@ -180,7 +180,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get repair => 'Repair';
 
   @override
-  String get boleAddisAbaba => 'Bole, Addis Ababa';
+  String get boleAddisAbaba => 'Location loading...';
 
   @override
   String discountOff(Object amount) {
@@ -408,4 +408,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get submitPaymentAndReview => 'Submit Payment & Review';
+
+  @override
+  String get searchForServicesAndPackages => 'Search for services and packages';
+
+  @override
+  String get cleaningServices => 'Cleaning Services';
+
+  @override
+  String get qualityWorkAffordablePrice =>
+      'Quality Work with\nAffordable Price';
+
+  @override
+  String get weBringProfessionalCleaningServices =>
+      'We bring professional cleaning services right to your home';
+
+  @override
+  String get welcomeBack => 'Welcome Back!';
+
+  @override
+  String get loginToYourAccount => 'Login to your account';
+
+  @override
+  String get createYourAccount => 'Create your account';
+
+  @override
+  String get photoLibrary => 'Photo Library';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String mustBeNdigits(int maxLength) {
+    return 'Must be $maxLength digits';
+  }
+
+  @override
+  String get describeYourIssue => 'Describe your issue';
+
+  @override
+  String get preferredDates => 'Preferred Dates';
+
+  @override
+  String get selectADateRange => 'Select a date range';
+
+  @override
+  String get pleaseFillAllFields => 'Please fill all fields before booking.';
+
+  @override
+  String get summary => 'Summary';
+
+  @override
+  String get dates => 'Dates';
+
+  @override
+  String get requestSent => 'Request Sent!';
+
+  @override
+  String get providerNotified =>
+      'The provider has been notified. You can view the status of your request in the bookings tab.';
+
+  @override
+  String get backToHome => 'Back to Home';
+
+  @override
+  String get enterDetailedDescription => 'Enter a detailed description...';
+
+  @override
+  String get enter6DigitPIN => 'Enter 6-digit PIN';
+
+  @override
+  String get enterYourFirstName => 'Enter your first name';
+
+  @override
+  String get enterYourLastName => 'Enter your last name';
+
+  @override
+  String get providerAgreementTitle => 'FIXADDIS SERVICE PROVIDER AGREEMENT';
+
+  @override
+  String get iAgreeToTheTerms => 'I agree to the terms and conditions';
+
+  @override
+  String get providerAgreementText =>
+      '(Independent Contractor Agreement)\nThis Agreement is entered into between:\nFIXADDIS (“Platform”)\nand\nThe registered Service Provider (“Provider”).\n\nBy signing or using the Platform, the Provider agrees to the following:\n\n1️⃣ Relationship\n\n1.1 The Provider is an independent contractor, not an employee, partner, or agent of FixAddis.\n1.2 The Provider is responsible for all taxes, permits, tools, transport, insurance (if applicable), and operational costs.\n1.3 FixAddis acts only as a digital marketplace connecting customers and Providers.\n\n2️⃣ Scope of Services\n\nThe Provider may offer services including but not limited to:\nRoadside mechanic services\nHome repair (plumbing, electrical, carpentry, etc.)\nAppliance repair\nCleaning services\nInstallation services\nAny other approved skilled service listed on the Platform\nProviders may only perform services they are qualified to perform.\n\n3️⃣ Verification & Eligibility\n\nPlatform confirms:\nValid identification submitted\nAccurate personal and contact details\nSufficient skill and experience\nAny legally required licenses\nLegal eligibility of provider to provide services in Ethiopia\nProviding false information results in immediate termination.\n\n4️⃣ Professional Conduct & Discipline \n\nProvider agrees to:\nTreat customers respectfully\nClearly explain pricing before starting work\nObtain customer approval before additional charges\nArrive within reasonable time\nMaintain professional appearance and behaviour \n\nProvider shall NOT:\n\nHarass, threaten, or intimidate customers\nOvercharge or manipulate pricing unfairly\nPerform services under alcohol or drug influence\nEngage in discrimination\nDemand payment beyond agreed amount\nMisrepresent FIXADDIS\nSerious violations result in immediate termination.\n\n5️⃣ Safety Obligations\n\nProvider is fully responsible for:\n\nSafe work practices\nUse of proper tools\nRoadside and site safety\nAvoiding damage to property\nCompliance with traffic and safety laws\n\nFixAddis is not liable for:\n\nInjuries\nProperty damage\nMechanical failure\nWork defects caused by Provider negligence\nProvider assumes full legal responsibility for services performed.\n\n6️⃣ Pricing & Commission\n\n6.1 Provider agrees to follow platform pricing guidelines.\n6.2 Final price must be agreed before work begins.\n6.3 Provider agrees to pay agreed commission or platform fees.\n6.4 Failure to pay commission may result in suspension and legal recovery.\n\n7️⃣ Anti-Bypass Clause\n\nProvider agrees:\nNot to solicit customers outside the Platform\nNot to share personal contact details for future direct jobs\nNot to intentionally avoid commission\nViolation may result in permanent removal and financial penalty.\n\n8️⃣ Ratings & Performance Monitoring\n\nFIXADDIS may monitor:\n\nCustomer ratings\nResponse time\nComplaint frequency\nJob completion rate\nPrice fairness\n\nProviders with repeated low performance may face:\n\nWarning\nTemporary suspension\nPermanent termination.\n\n9️⃣ Customer Complaints & Refunds\n\nProvider agrees to:\n\nCooperate with investigations\nRespond within 48 hours\nAccept fair dispute resolution\nFIXADDIS may require refunds in cases of proven misconduct.\n\n1️⃣0️⃣ Suspension & Termination\n\nFixAddis may immediately suspend or terminate access for:\n\nSafety violations\nFraud\nHarassment\nCriminal conduct\nRepeated poor ratings\nCommission evasion\nNo notice required in serious cases.\n\n1️⃣1️⃣ confidenciality\n\nProvider agrees not to disclose:\nCustomer data\nInternal policies\nPricing structures\nPlatform operational information.\n\n1️⃣2️⃣ Amendments\n\nFixAddis may update this Agreement at any time.\nContinued platform use indicates acceptance.';
 }

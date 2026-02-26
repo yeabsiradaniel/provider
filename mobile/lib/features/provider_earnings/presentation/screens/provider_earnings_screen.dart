@@ -164,7 +164,7 @@ class ProviderEarningsScreen extends ConsumerWidget {
       barRods: [
         BarChartRodData(
           toY: y,
-          color: Colors.blue,
+          color: Colors.black,
           width: 22,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(6),

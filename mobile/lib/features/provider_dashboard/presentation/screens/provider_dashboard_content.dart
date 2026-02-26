@@ -26,7 +26,6 @@ class _ProviderDashboardContentState
   final DashboardService _dashboardService = DashboardService();
   List<Job> _incomingJobs = [];
   bool _isLoadingJobs = true;
-  bool _isTapped = false;
 
   @override
   void initState() {
@@ -69,7 +68,6 @@ class _ProviderDashboardContentState
     final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(userProvider).value;
 
-    // Listen for real-time new job requests
     ref.listen<int>(newRequestNotifierProvider, (previous, next) {
       if (next > (previous ?? 0)) {
         _fetchIncomingJobs();
@@ -85,184 +83,181 @@ class _ProviderDashboardContentState
     final profileAsyncValue = ref.watch(providerProfileProvider(user.id));
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: SafeArea(
-        child: profileAsyncValue.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Error: $err')),
-          data: (profile) {
-            if (profile == null) {
-              return const Center(child: Text('Provider profile not found.'));
-            }
-            final bool isOnline = profile.isOnline;
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF1E293B),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(40),
+      backgroundColor: Colors.grey.shade50,
+      body: profileAsyncValue.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (profile) {
+          if (profile == null) {
+            return const Center(child: Text('Provider profile not found.'));
+          }
+          final bool isOnline = profile.isOnline;
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                backgroundColor: Colors.white,
+                pinned: true,
+                elevation: 0.5,
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text(
+                      l10n.providerDashboard,
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${user.firstName} ${user.lastName}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(color: Colors.white),
-                                ),
-                                Text(
-                                  l10n.providerDashboard,
-                                  style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontSize: 12),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProviderSettingsScreen(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.settings,
-                                  color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          l10n.totalEarningsMonth,
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                        Text(
-                          '${profile.earnings} ETB',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      '${user.firstName} ${user.lastName}',
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: StatCard(
-                              title: l10n.avgRating,
-                              value: profile.user.rating?.toStringAsFixed(1) ?? '0.0',
-                              color: Colors.green),
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const ProviderSettingsScreen(),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: GestureDetector(
-                            onTapDown: (_) => setState(() => _isTapped = true),
-                            onTapUp: (_) {
-                              setState(() => _isTapped = false);
-                              _toggleStatus(isOnline);
-                            },
-                            onTapCancel: () => setState(() => _isTapped = false),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
-                              transform: Matrix4.identity()
-                                ..scale(_isTapped ? 0.95 : 1.0),
-                              child: StatCard(
-                                title: l10n.status,
-                                value: isOnline ? l10n.online : l10n.offline,
-                                color: isOnline ? Colors.green : Colors.red,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              l10n.incomingRequests,
-                              style:
-                                  Theme.of(context).textTheme.titleLarge,
-                            ),
-                            if (_incomingJobs.isNotEmpty)
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Text(_incomingJobs.length.toString(),
-                                    style: const TextStyle(
-                                        color: Colors.white)),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        _isLoadingJobs
-                            ? const Center(child: CircularProgressIndicator())
-                            : ListView.separated(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: _incomingJobs.length,
-                                itemBuilder: (context, index) {
-                                  final job = _incomingJobs[index];
-                                  return JobRequestCard(
-                                    initials: '${job.clientId?.firstName.substring(0, 1) ?? '?'}${job.clientId?.lastName.substring(0, 1) ?? ''}',
-                                    name: '${job.clientId?.firstName ?? 'Unknown'} ${job.clientId?.lastName ?? 'Client'}',
-                                    details: job.serviceName,
-                                    onTap: () async {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProviderChatScreen(job: job),
-                                        ),
-                                      );
-                                      if (result == true) {
-                                        _fetchIncomingJobs();
-                                      }
-                                    },
-                                  );
-                                },
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 16),
-                              ),
-                      ],
-                    ),
+                      );
+                    },
+                    icon: const Icon(Icons.settings_outlined, color: Colors.black),
                   ),
                 ],
               ),
-            );
-          },
-        ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                       Row(
+                        children: [
+                          Expanded(
+                            child: StatCard(
+                              icon: Icons.star_border,
+                              title: l10n.avgRating,
+                              value: profile.user.rating?.toStringAsFixed(1) ?? 'N/A',
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: StatCard(
+                              icon: Icons.account_balance_wallet_outlined,
+                              title: l10n.totalEarningsMonth,
+                              value: '${profile.earnings} ETB',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: () => _toggleStatus(isOnline),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isOnline ? Colors.black : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                             border: isOnline ? null : Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.power_settings_new, color: isOnline ? Colors.white : Colors.black),
+                              const SizedBox(width: 8),
+                              Text(
+                                isOnline ? l10n.online.toUpperCase() : l10n.offline.toUpperCase(),
+                                style: TextStyle(
+                                  color: isOnline ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ),
+
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.incomingRequests,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                       if (_incomingJobs.isNotEmpty)
+                          Container(
+                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            child: Text(_incomingJobs.length.toString(),
+                                style: const TextStyle(
+                                    color: Colors.white, fontWeight: FontWeight.bold)),
+                          ),
+                    ],
+                  ),
+                ),
+              ),
+              _isLoadingJobs
+                ? const SliverToBoxAdapter(child: Center(child: Padding(
+                  padding: EdgeInsets.all(32.0),
+                  child: CircularProgressIndicator(),
+                )))
+                : _incomingJobs.isEmpty ? SliverToBoxAdapter(
+                  child: Center(child: Padding(
+                    padding: const EdgeInsets.all(48.0),
+                    child: Text('No new job requests.', style: TextStyle(color: Colors.grey.shade600)),
+                  )),
+                )
+                : SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                           final job = _incomingJobs[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: JobRequestCard(
+                                initials: '${job.clientId?.firstName.substring(0, 1) ?? '?'}${job.clientId?.lastName.substring(0, 1) ?? ''}',
+                                name: '${job.clientId?.firstName ?? 'Unknown'} ${job.clientId?.lastName ?? 'Client'}',
+                                details: job.serviceName,
+                                onTap: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProviderChatScreen(job: job),
+                                    ),
+                                  );
+                                  if (result == true) {
+                                    _fetchIncomingJobs();
+                                  }
+                                },
+                              ),
+                            );
+                        },
+                        childCount: _incomingJobs.length,
+                      ),
+                    ),
+                )
+            ],
+          );
+        },
       ),
     );
   }
