@@ -4,12 +4,40 @@ import 'package:intl/intl.dart';
 import 'package:mobile/features/bookings/domain/models/job.dart';
 import 'package:mobile/features/bookings/domain/providers/booking_provider.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BookingsScreen extends ConsumerWidget {
   const BookingsScreen({Key? key}) : super(key: key);
 
+  Future<void> _launchPhone(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    var status = await Permission.phone.status;
+    if (status.isGranted) {
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      } else {
+        throw 'Could not launch $phoneUri';
+      }
+    } else {
+      if (await Permission.phone.request().isGranted) {
+        if (await canLaunchUrl(phoneUri)) {
+          await launchUrl(phoneUri);
+        } else {
+          throw 'Could not launch $phoneUri';
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(customerBookingsProvider, (previous, next) {
+      if (next is AsyncData) {
+        print('Bookings provider has new data.');
+      }
+    });
+
     final l10n = AppLocalizations.of(context)!;
     final bookingsAsyncValue = ref.watch(customerBookingsProvider);
     final theme = Theme.of(context);
@@ -150,6 +178,25 @@ class BookingsScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+                if (job.status == 'ACCEPTED' && job.providerId?.phone != null)
+                  const SizedBox(height: 8),
+                if (job.status == 'ACCEPTED' && job.providerId?.phone != null)
+                  InkWell(
+                    onTap: () => _launchPhone(job.providerId!.phone),
+                    child: Row(
+                      children: [
+                        Icon(Icons.phone, size: 12, color: theme.colorScheme.secondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          job.providerId!.phone,
+                          style: TextStyle(
+                            color: theme.colorScheme.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

@@ -2,11 +2,18 @@ const jobService = require('../services/jobService');
 
 const createJob = async (req, res) => {
     try {
+        console.log('[JOB-TRACE] createJob controller initiated by user:', req.user.id);
         const job = await jobService.createJob(req.user.id, req.body);
+        console.log('[JOB-TRACE] Job created in database:', JSON.stringify(job, null, 2));
+        
         // Emit real-time event to the specific provider
-        req.io.to(job.providerId.toString()).emit('newJobRequest', job);
+        const providerRoom = job.providerId.toString();
+        console.log(`[JOB-TRACE] Emitting 'newJobRequest' to room: ${providerRoom} for job: ${job._id}`);
+        req.io.to(providerRoom).emit('newJobRequest', job);
+        
         res.status(201).json(job);
     } catch (error) {
+        console.error('[JOB-TRACE] Error in createJob controller:', error);
         res.status(500).json({ message: 'Error creating job.', error: error.message });
     }
 };
@@ -23,11 +30,19 @@ const acceptJob = async (req, res) => {
 
 const finishJob = async (req, res) => {
     try {
+        console.log('[SOCKET-TRACE] finishJob controller triggered', { jobId: req.params.id, providerId: req.user.id });
         const job = await jobService.finishJob(req.params.id, req.user.id);
+        console.log('[SOCKET-TRACE] Job status updated to COMPLETED in DB', { jobId: job._id.toString(), clientId: job.clientId.toString() });
+        
         // Emit the event ONLY to the client.
-        req.io.to(job.clientId.toString()).emit('jobFinished', job);
+        const clientRoom = job.clientId.toString();
+        req.io.to(clientRoom).emit('jobFinished', job);
+        
+        console.log('[SOCKET-TRACE] Emitting jobFinished to client room', { room: clientRoom, jobId: job._id.toString() });
+        
         res.status(200).json(job);
     } catch (error) {
+        console.error('[SOCKET-TRACE] Error in finishJob controller', { jobId: req.params.id, providerId: req.user.id, error: error.message });
         res.status(400).json({ message: 'Error finishing job.', error: error.message });
     }
 };

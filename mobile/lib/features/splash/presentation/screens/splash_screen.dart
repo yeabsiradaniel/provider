@@ -6,8 +6,11 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDarkMode ? Colors.grey[850] : Colors.grey[400],
       body: Stack(
         children: [
           Center(
@@ -30,9 +33,9 @@ class SplashScreen extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context)!.splashSubtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF475569),
+                      color: theme.textTheme.bodyMedium?.color,
                       fontWeight: FontWeight.w500,
                       height: 1.5,
                       fontFamily: 'Plus Jakarta Sans'

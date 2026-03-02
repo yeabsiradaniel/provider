@@ -1,0 +1,19 @@
+.formModalHeader {
+    margin: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.formModalContent {
+    padding: 24px 0;
+}
+
+.formModalFooter {
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

@@ -24,12 +24,15 @@ dependencies:
   mime: ^2.0.0
   flutter_rating_bar: ^4.0.1
   socket_io_client: ^3.1.4
+  flutter_local_notifications: ^17.2.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   image: ^4.0.17
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   generate: true
@@ -51,3 +54,8 @@ flutter:
         - asset: assets/fonts/NotoSansEthiopic-Regular.ttf
         - asset: assets/fonts/NotoSansEthiopic-Bold.ttf
           weight: 700
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/2.0x/Asset 1.png"

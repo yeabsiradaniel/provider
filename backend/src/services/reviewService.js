@@ -3,6 +3,7 @@ const Review = require('../models/Review');
 const User = require('../models/User');
 const Job = require('../models/Job');
 const ProviderProfile = require('../models/ProviderProfile');
+const AdminLedger = require('../models/AdminLedger');
 
 
 const createReview = async (clientId, reviewData) => {
@@ -44,6 +45,29 @@ const createReview = async (clientId, reviewData) => {
     if (providerProfile && paidAmount) {
         providerProfile.earnings += paidAmount;
         await providerProfile.save();
+    }
+
+    // Create ledger entries for the transaction
+    if (paidAmount && paidAmount > 0) {
+        const commissionAmount = paidAmount * 0.10; // 10% commission
+
+        // 1. Record the payout to the provider
+        const payoutEntry = new AdminLedger({
+            jobId,
+            providerId: job.providerId,
+            amount: paidAmount,
+            type: 'payout',
+        });
+        await payoutEntry.save();
+
+        // 2. Record the commission earned by the platform
+        const commissionEntry = new AdminLedger({
+            jobId,
+            providerId: job.providerId,
+            amount: -commissionAmount, // Negative value for commission debit
+            type: 'commission',
+        });
+        await commissionEntry.save();
     }
 
     return review;

@@ -39,6 +39,10 @@ class UserService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
+    log('--- Updating User ---');
+    log('Token: $token');
+    log('User Data: ${jsonEncode(userData)}');
+
     if (token == null) {
       throw Exception('No token found');
     }
@@ -52,6 +56,10 @@ class UserService {
       body: jsonEncode(userData),
     );
 
+    log('--- Update User Response ---');
+    log('Status Code: ${response.statusCode}');
+    log('Body: ${response.body}');
+
     if (response.statusCode == 200) {
       return User.fromJson(json.decode(response.body));
     } else {
@@ -63,6 +71,10 @@ class UserService {
   Future<User> uploadProfilePicture(File image) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    
+    log('--- Uploading Profile Picture ---');
+    log('Auth Token: $token');
+    log('Image Path: ${image.path}');
 
     if (token == null) {
       throw Exception('No token found');
@@ -70,11 +82,14 @@ class UserService {
 
     // Look up the MIME type of the file
     final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+    final contentType = MediaType(mimeTypeData![0], mimeTypeData[1]);
+    
+    log('Content-Type: $contentType');
 
     final imageFile = await http.MultipartFile.fromPath(
       'profilePhoto',
       image.path,
-      contentType: MediaType(mimeTypeData![0], mimeTypeData[1]),
+      contentType: contentType,
     );
 
     final request = http.MultipartRequest(
@@ -83,14 +98,22 @@ class UserService {
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(imageFile);
+    
+    log('Request Headers: ${request.headers}');
+    log('Request Fields: ${request.fields}');
+    log('Request Files: ${request.files.map((f) => '${f.field}: ${f.filename} (${f.contentType})').toList()}');
 
     final response = await request.send();
 
+    final responseBody = await response.stream.bytesToString();
+    log('--- Upload Response ---');
+    log('Status Code: ${response.statusCode}');
+    log('Response Body: $responseBody');
+
+
     if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString();
       return User.fromJson(json.decode(responseBody));
     } else {
-      final responseBody = await response.stream.bytesToString();
       log('Failed to upload profile picture. Status code: ${response.statusCode}, Body: ${responseBody}');
       throw Exception('Failed to upload profile picture');
     }

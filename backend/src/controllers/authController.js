@@ -19,9 +19,9 @@ const requestOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
     const { phoneNumber, otp, firstName, lastName, pin, role } = req.body;
     
-    // Extract file paths from multer
-    const profilePhotoPath = req.files.profilePhoto ? `/uploads/${req.files.profilePhoto[0].filename}` : null;
-    const idPhotoPath = req.files.idPhoto ? `/uploads/${req.files.idPhoto[0].filename}` : null;
+    // Extract file paths from multer, but only if req.files exists
+    const profilePhotoPath = (req.files && req.files.profilePhoto) ? `/uploads/${req.files.profilePhoto[0].filename}` : null;
+    const idPhotoPath = (req.files && req.files.idPhoto) ? `/uploads/${req.files.idPhoto[0].filename}` : null;
 
     if (!phoneNumber || !otp) {
         return res.status(400).json({ message: 'Phone number and OTP are required.' });

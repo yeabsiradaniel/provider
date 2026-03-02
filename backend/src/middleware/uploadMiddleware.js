@@ -29,6 +29,8 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 10000000 }, // 10MB limit
     fileFilter: function(req, file, cb){
+        console.log('--- Multer File Filter ---');
+        console.log('File:', file);
         checkFileType(file, cb);
     }
 }).fields([{ name: 'profilePhoto', maxCount: 1 }, { name: 'idPhoto', maxCount: 1 }]);

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/features/review/presentation/screens/rating_screen.dart';
@@ -9,13 +10,26 @@ import 'package:mobile/features/bookings/domain/providers/booking_provider.dart'
 import 'package:mobile/features/provider_earnings/domain/providers/provider_earnings_provider.dart';
 import 'package:mobile/features/provider_schedule/domain/providers/provider_schedule_provider.dart';
 
+import 'package:mobile/core/services/notification_service.dart';
+import 'package:mobile/features/user/domain/providers/user_provider.dart';
+
 class SocketService {
   final Ref _ref;
   IO.Socket? _socket;
+  late StreamController<dynamic> _messageStreamController;
 
-  SocketService(this._ref);
+  SocketService(this._ref) {
+    _messageStreamController = StreamController<dynamic>.broadcast();
+  }
+
+  Stream<dynamic> get messageStream => _messageStreamController.stream;
 
   void initSocket() async {
+    // Ensure the stream controller is open before proceeding.
+    if (_messageStreamController.isClosed) {
+      _messageStreamController = StreamController<dynamic>.broadcast();
+    }
+
     log('--- [LOG] SocketService: initSocket called. ---');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -49,10 +63,33 @@ class SocketService {
 
   void _listenToEvents() {
     log('--- [LOG] SocketService: Registering event listeners. ---');
+    final notificationService = _ref.read(notificationServiceProvider);
+    final currentUser = _ref.read(userProvider).value;
 
-    _socket!.on('newJobRequest', (_) {
+
+    // Listener for incoming messages
+    _socket!.on('receiveMessage', (data) {
+      log('--- [LOG] SocketService: Received receiveMessage event, adding to stream. ---');
+      _messageStreamController.add(data);
+      // Only show notification if the message is from another user
+      if (currentUser != null && data['senderId'] != currentUser.id) {
+        notificationService.showNotification(
+          id: data['jobId'].hashCode,
+          title: 'New Message',
+          body: data['text'] ?? 'You have received a new message.',
+        );
+      }
+    });
+
+    _socket!.on('newJobRequest', (data) {
       log('--- [LOG] SocketService: Received newJobRequest event ---');
       _ref.read(newRequestNotifierProvider.notifier).notify();
+      notificationService.showNotification(
+        id: data['_id'].hashCode,
+        title: 'New Job Request',
+        body:
+            'You have a new request for ${data?['serviceName'] ?? 'a service'}.',
+      );
     });
 
     _socket!.on('jobAccepted', (_) {
@@ -66,6 +103,15 @@ class SocketService {
       _ref.refresh(customerBookingsProvider);
       _ref.refresh(providerScheduleProvider);
       _ref.refresh(providerEarningsProvider);
+      
+      // Only show notification to the client
+      if (currentUser != null && currentUser.role == 'client') {
+        notificationService.showNotification(
+          id: data['_id'].hashCode,
+          title: 'Job Finished',
+          body: 'Your job has been marked as complete. Please leave a rating.',
+        );
+      }
 
       // Use the navigator key to get a context for the dialog
       final context = _ref.read(navigatorKeyProvider).currentContext;
@@ -94,16 +140,9 @@ class SocketService {
     _socket?.emit('sendMessage', data);
   }
 
-  void listenForMessages(Function(dynamic) handler) {
-    log('--- [LOG] SocketService: Attaching listener for receiveMessage event. ---');
-    _socket?.on('receiveMessage', (data) {
-      log('--- [LOG] SocketService: Received receiveMessage event ---');
-      handler(data);
-    });
-  }
-
   void dispose() {
     log('--- [LOG] SocketService: dispose called. ---');
+    _messageStreamController.close();
     _socket?.dispose();
   }
 }
@@ -116,7 +155,10 @@ final newRequestNotifierProvider =
 
 class NewRequestNotifier extends StateNotifier<int> {
   NewRequestNotifier() : super(0);
-  void notify() => state++;
+  void notify() {
+    log('--- [LOG] NewRequestNotifier: notify() called. State is now ${state + 1}. ---');
+    state++;
+  }
 }
 
 final socketServiceProvider = Provider<SocketService>((ref) {

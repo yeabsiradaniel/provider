@@ -1,0 +1,33 @@
+.statCard {
+    display: flex;
+    align-items: center;
+}
+
+.iconWrapper {
+    padding: 16px;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.textWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-secondary);
+    font-weight: bold;
+}
+
+.value {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--color-primary);
+}

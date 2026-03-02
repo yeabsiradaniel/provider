@@ -1,0 +1,31 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  border-radius: var(--radius-button);
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-inverse);
+}
+
+.primary:hover {
+  background-color: #333; /* A slightly lighter black for hover */
+}
+
+.destructive {
+  background-color: var(--color-error);
+  color: var(--color-primary-inverse);
+}
+
+.destructive:hover {
+  background-color: #d9534f; /* A slightly lighter red for hover */
+}

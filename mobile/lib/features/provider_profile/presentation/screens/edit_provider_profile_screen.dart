@@ -49,9 +49,9 @@ class _EditProviderProfileScreenState
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
       setState(() {
@@ -60,16 +60,60 @@ class _EditProviderProfileScreenState
     }
   }
 
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bc) {
+        final l10n = AppLocalizations.of(context)!;
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined, color: Colors.black),
+                title: Text(l10n.photoLibrary, style: const TextStyle(color: Colors.black)),
+                onTap: () {
+                  _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera_outlined, color: Colors.black),
+                title: Text(l10n.camera, style: const TextStyle(color: Colors.black)),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _updateProfile() async {
+    log('--- Updating provider profile ---');
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
+
+      log('First Name: ${_firstNameController.text}');
+      log('Last Name: ${_lastNameController.text}');
+      log('Phone: ${_phoneController.text}');
+      log('Profile Image is null: ${_profileImage == null}');
+
       try {
         User? userWithNewImage;
         if (_profileImage != null) {
+          log('Uploading new image for provider...');
           userWithNewImage =
               await _userService.uploadProfilePicture(_profileImage!);
+          log('Image uploaded for provider, new File ID: ${userWithNewImage.profilePhoto}');
         }
 
         final updatedData = {
@@ -79,6 +123,8 @@ class _EditProviderProfileScreenState
           if (userWithNewImage?.profilePhoto != null)
             'profilePhoto': userWithNewImage!.profilePhoto,
         };
+
+        log('Updated provider data: $updatedData');
 
         final updatedUser = await _userService.updateUser(updatedData);
 
@@ -95,7 +141,7 @@ class _EditProviderProfileScreenState
         );
         Navigator.of(context).pop();
       } catch (e) {
-        log('Error updating profile: $e');
+        log('Error updating provider profile: $e');
         setState(() {
           _isLoading = false;
         });
@@ -149,7 +195,7 @@ class _EditProviderProfileScreenState
                             bottom: 0,
                             right: 0,
                             child: GestureDetector(
-                              onTap: _pickImage,
+                              onTap: () => _showPicker(context),
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(

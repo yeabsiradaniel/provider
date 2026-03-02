@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/services/socket_service.dart';
@@ -27,6 +28,7 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
   bool _isLoading = true;
   bool _isAccepting = false;
   bool _isDeclining = false;
+  StreamSubscription? _messageSubscription;
 
   @override
   void initState() {
@@ -34,23 +36,29 @@ class _ProviderChatScreenState extends ConsumerState<ProviderChatScreen> {
     log('--- [LOG] ProviderChatScreen: initState ---');
     _fetchMessages();
     
-    log('--- [LOG] ProviderChatScreen: Setting up socket listeners... ---');
     final socketService = ref.read(socketServiceProvider);
     socketService.joinJobRoom(widget.job.id);
-    socketService.listenForMessages((data) {
-       log('--- [LOG] ProviderChatScreen: Message received from socket. ---');
-       final message = Message.fromJson(data);
-       if (mounted) {
-        setState(() {
-          _messages.add(message);
-        });
+
+    log('--- [LOG] ProviderChatScreen: Subscribing to message stream. ---');
+    _messageSubscription = socketService.messageStream.listen((data) {
+      log('--- [LOG] ProviderChatScreen: Message received from stream. ---');
+      // Filter messages to ensure they belong to the current job
+      if (data['jobId'] == widget.job.id) {
+        final message = Message.fromJson(data);
+        if (mounted) {
+          setState(() {
+            _messages.add(message);
+          });
+        }
       }
     });
-    log('--- [LOG] ProviderChatScreen: Socket listeners set up. ---');
   }
 
   @override
   void dispose() {
+    log('--- [LOG] ProviderChatScreen: dispose ---');
+    log('--- [LOG] ProviderChatScreen: Cancelling message subscription. ---');
+    _messageSubscription?.cancel();
     _messageController.dispose();
     super.dispose();
   }

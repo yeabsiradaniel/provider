@@ -51,12 +51,22 @@ const searchProviders = async (categoryIds, userLocation) => {
     try {
         const idsAsStrings = categoryIds.map(id => id.trim());
 
+        // First, get all verified provider user IDs
+        const verifiedUsers = await User.find({ verified: true, role: 'provider' }).select('_id');
+        const verifiedUserIds = verifiedUsers.map(user => user._id);
+
+        // If no providers are verified, there's nothing to return
+        if (verifiedUserIds.length === 0) {
+            return [];
+        }
+
         const query = {
             'serviceCategories.category': { $in: idsAsStrings },
+            'userId': { $in: verifiedUserIds } // <-- This is the new filter condition
         };
 
         const profiles = await ProviderProfile.find(query)
-            .populate('userId', 'firstName lastName phone rating profilePhoto location role')
+            .populate('userId', 'firstName lastName phone rating profilePhoto location role verified') // ensure 'verified' is populated
             .populate('serviceCategories.category');
             
         const validProfiles = profiles.filter(p => p.userId);

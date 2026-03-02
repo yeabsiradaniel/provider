@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:mobile/features/provider_earnings/domain/providers/provider_earnings_provider.dart';
 import 'package:mobile/l10n/app_localizations.dart';
-import 'package:mobile/core/theme/app_colors.dart';
 
 class ProviderEarningsScreen extends ConsumerWidget {
   const ProviderEarningsScreen({Key? key}) : super(key: key);
@@ -73,22 +72,62 @@ class ProviderEarningsScreen extends ConsumerWidget {
                               alignment: BarChartAlignment.spaceAround,
                                barTouchData: BarTouchData(enabled: false),
                               titlesData: FlTitlesData(
-                                 show: true,
+                                show: true,
                                 bottomTitles: AxisTitles(
                                   sideTitles: SideTitles(
                                     showTitles: true,
                                     getTitlesWidget: (value, meta) {
-                                      return Text(_getMonthName(value.toInt()), style: TextStyle(color: theme.colorScheme.secondary, fontSize: 12));
+                                      return Text(
+                                        _getMonthName(value.toInt()),
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color,
+                                          fontSize: 12,
+                                        ),
+                                      );
                                     },
-                                     reservedSize: 30,
+                                    reservedSize: 30,
                                   ),
                                 ),
-                                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    reservedSize: 40,
+                                    getTitlesWidget: (value, meta) {
+                                      if (value == meta.max || value == meta.min) return Container();
+                                      return Text(
+                                        value.toInt().toString(),
+                                        style: TextStyle(
+                                           color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color,
+                                          fontSize: 12,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
                               ),
-                               borderData: FlBorderData(show: false),
-                               gridData: const FlGridData(show: false),
+                              borderData: FlBorderData(show: false),
+                              gridData: FlGridData(
+                                show: true,
+                                drawHorizontalLine: true,
+                                drawVerticalLine: false,
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.1),
+                                    strokeWidth: 1,
+                                  );
+                                },
+                              ),
                               barGroups: earnings.monthlyEarnings.entries
                                   .map((entry) => _buildBarGroup(
                                       _getMonthIndex(entry.key), entry.value, theme))
@@ -160,6 +199,7 @@ class ProviderEarningsScreen extends ConsumerWidget {
   }
 
   Widget _buildTransactionItem(String title, String amount, bool isCredit, ThemeData theme) {
+    final color = isCredit ? theme.colorScheme.primary : theme.colorScheme.error;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -178,7 +218,7 @@ class ProviderEarningsScreen extends ConsumerWidget {
             ),
             child: Icon(
               isCredit ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-              color: isCredit ? AppColors.success : AppColors.error,
+              color: color,
             ),
           ),
           const SizedBox(width: 12),
@@ -186,7 +226,7 @@ class ProviderEarningsScreen extends ConsumerWidget {
           Text(
             amount,
             style: TextStyle(
-              color: isCredit ? AppColors.success : AppColors.error,
+              color: color,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),

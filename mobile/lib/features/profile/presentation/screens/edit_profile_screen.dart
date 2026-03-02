@@ -45,9 +45,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
       setState(() {
@@ -56,11 +56,53 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
   }
 
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bc) {
+        final l10n = AppLocalizations.of(context)!;
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined, color: Colors.black),
+                title: Text(l10n.photoLibrary, style: const TextStyle(color: Colors.black)),
+                onTap: () {
+                  _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera_outlined, color: Colors.black),
+                title: Text(l10n.camera, style: const TextStyle(color: Colors.black)),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _updateProfile() async {
+    log('--- Updating profile ---');
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
+
+      log('First Name: ${_firstNameController.text}');
+      log('Last Name: ${_lastNameController.text}');
+      log('Phone: ${_phoneController.text}');
+      log('Profile Image is null: ${_profileImage == null}');
+
       try {
         User? userWithNewImage;
         if (_profileImage != null) {
@@ -77,6 +119,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           if (userWithNewImage?.profilePhoto != null)
             'profilePhoto': userWithNewImage!.profilePhoto,
         };
+
+        log('Updated data: $updatedData');
 
         final updatedUser = await _userService.updateUser(updatedData);
 
@@ -142,7 +186,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             bottom: 0,
                             right: 0,
                             child: GestureDetector(
-                              onTap: _pickImage,
+                              onTap: () => _showPicker(context),
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(

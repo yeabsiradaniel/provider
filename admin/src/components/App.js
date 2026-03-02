@@ -1,24 +1,33 @@
-import logo from './logo.svg';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import AdminLayout from '../layouts/AdminLayout';
+import DashboardPage from '../pages/DashboardPage';
+import LoginPage from '../pages/LoginPage';
+import UsersPage from '../pages/UsersPage';
+import CategoriesPage from '../pages/CategoriesPage';
+import ProviderProfilesPage from '../pages/ProviderProfilesPage';
+import JobsPage from '../pages/JobsPage';
+import ReviewsPage from '../pages/ReviewsPage';
+import LedgerPage from '../pages/LedgerPage';
+import ProtectedRoute from './ProtectedRoute';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/components/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<AdminLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="provider-profiles" element={<ProviderProfilesPage />} />
+          <Route path="categories" element={<CategoriesPage />} />
+          <Route path="jobs" element={<JobsPage />} />
+          <Route path="reviews" element={<ReviewsPage />} />
+          <Route path="ledger" element={<LedgerPage />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
 

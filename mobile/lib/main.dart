@@ -54,8 +54,6 @@ class MyApp extends ConsumerWidget {
       // Use a Builder to ensure we have a clean startup sequence.
       home: Builder(
         builder: (context) {
-          // Initialize the socket service.
-          ref.read(socketServiceProvider).initSocket();
           // Return the first screen of the app.
           return const AuthCheckScreen();
         },

@@ -1,6 +1,5 @@
 // Service for job lifecycle management
 const Job = require('../models/Job');
-const AdminLedger = require('../models/AdminLedger');
 const User = require('../models/User');
 const ProviderProfile = require('../models/ProviderProfile');
 
@@ -37,15 +36,6 @@ const finishJob = async (jobId, providerId) => {
     job.completedAt = new Date();
     await job.save();
 
-    // Record ledger entry for admin
-    const commission = (job.agreedPrice || 0) * 0.1; // Example 10% commission
-    const ledgerEntry = new AdminLedger({
-        providerId,
-        jobId,
-        amount: commission,
-    });
-    await ledgerEntry.save();
-
     return job;
 };
 
@@ -58,7 +48,7 @@ const getJobHistory = async (userId) => {
 };
 
 const getJobsForClient = async (clientId) => {
-    return await Job.find({ clientId })
+    return await Job.find({ clientId, status: { $ne: 'DECLINED' } })
         .populate('clientId', 'firstName lastName profilePhoto phone role')
         .populate('providerId', 'firstName lastName profilePhoto phone role')
         .sort({ createdAt: -1 });

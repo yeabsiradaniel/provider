@@ -71,6 +71,9 @@ class _ProviderDashboardContentState
 
     ref.listen<int>(newRequestNotifierProvider, (previous, next) {
       if (next > (previous ?? 0)) {
+        // Log that the listener was triggered and is fetching jobs
+        print(
+            '--- [LOG] ProviderDashboardContent: newRequestNotifierProvider triggered. Fetching incoming jobs. ---');
         _fetchIncomingJobs();
       }
     });

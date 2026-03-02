@@ -19,11 +19,13 @@ class LanguageSelectionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     final locale = ref.watch(localeProvider);
     final selectedIndex = locale.languageCode == 'am' ? 0 : 1;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.grey[850] : Colors.grey[400],
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -35,20 +37,20 @@ class LanguageSelectionScreen extends ConsumerWidget {
               Text(
                 AppLocalizations.of(context)!.selectYourLanguage,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: theme.textTheme.displaySmall?.color,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 AppLocalizations.of(context)!.language.toUpperCase(),
-                 textAlign: TextAlign.center,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade500,
+                  color: theme.textTheme.bodySmall?.color,
                   letterSpacing: 1.5,
                 ),
               ),

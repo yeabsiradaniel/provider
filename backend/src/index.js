@@ -15,6 +15,7 @@ const userRoutes = require('./routes/user');
 const searchRoutes = require('./routes/search');
 const chatRoutes = require('./routes/chat'); // Import chat routes
 const chatService = require('./services/chatService'); // Import chat service
+const Job = require('./models/Job'); // Import Job model
 
 const app = express();
 const server = http.createServer(app);
@@ -61,42 +62,68 @@ const jwt = require('jsonwebtoken');
 
 // --- Socket.IO Authentication Middleware ---
 io.use((socket, next) => {
+    console.log('[SOCKET-TRACE] Authentication attempt', { socketId: socket.id });
     const token = socket.handshake.auth.token;
     if (!token) {
+        console.log('[SOCKET-TRACE] Authentication failed: Token not provided', { socketId: socket.id });
         return next(new Error('Authentication error: Token not provided'));
     }
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
+            console.log('[SOCKET-TRACE] Authentication failed: Invalid token', { socketId: socket.id });
             return next(new Error('Authentication error: Invalid token'));
         }
         socket.user = decoded; // Attach user info to the socket
+        console.log('[SOCKET-TRACE] Authentication successful', { socketId: socket.id, userId: socket.user.userId, role: socket.user.role });
         next();
     });
 });
 
 // --- Socket.IO Connection ---
 io.on('connection', (socket) => {
-  console.log('a user connected:', socket.user.userId);
+  console.log('[SOCKET-TRACE] User connected', { socketId: socket.id, userId: socket.user.userId });
 
   // Automatically join a room based on the user's ID
-  socket.join(socket.user.userId);
+  const userRoom = socket.user.userId.toString();
+  socket.join(userRoom);
+  console.log('[SOCKET-TRACE] User joined personal room', { socketId: socket.id, userId: socket.user.userId, room: userRoom });
 
   socket.on('joinJobRoom', (jobId) => {
-    socket.join(jobId);
-    console.log(`User ${socket.user.userId} joined room for job: ${jobId}`);
+    const jobRoom = jobId.toString();
+    socket.join(jobRoom);
+    console.log(`[SOCKET-TRACE] User joined job room`, { socketId: socket.id, userId: socket.user.userId, room: jobRoom });
   });
 
   socket.on('sendMessage', async (data) => {
+    console.log('[SOCKET-TRACE] sendMessage event received', { socketId: socket.id, userId: socket.user.userId, data });
     try {
-      const message = await chatService.createMessage(socket.user.userId, data);
-      io.to(data.jobId).emit('receiveMessage', message);
+        const message = await chatService.createMessage(socket.user.userId, data);
+        const job = await Job.findById(data.jobId);
+
+        // --- DEBUG LOGGING ---
+        console.log('[SOCKET-DEBUG] Fetched Job Object:', JSON.stringify(job, null, 2));
+        // --- END DEBUG LOGGING ---
+
+        if (job) {
+            const jobRoom = data.jobId.toString();
+            const clientRoom = job.clientId.toString();
+            const providerRoom = job.providerId.toString();
+
+            // Emit to the specific job room, and the personal rooms of both users
+            io.to(jobRoom).to(clientRoom).to(providerRoom).emit('receiveMessage', message);
+
+            console.log('[SOCKET-TRACE] Emitting receiveMessage to rooms', {
+                rooms: [jobRoom, clientRoom, providerRoom],
+                messageId: message._id.toString()
+            });
+        }
     } catch (error) {
-      console.error('Socket sendMessage error:', error);
+      console.error('[SOCKET-TRACE] Error in sendMessage event', { socketId: socket.id, userId: socket.user.userId, error: error.message });
     }
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected:', socket.user.userId);
+    console.log('[SOCKET-TRACE] User disconnected', { socketId: socket.id, userId: socket.user.userId });
   });
 });
 

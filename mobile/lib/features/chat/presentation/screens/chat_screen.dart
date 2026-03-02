@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/services/socket_service.dart';
@@ -19,10 +20,10 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ChatService _chatService = ChatService();
   final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
   
   List<Message> _messages = [];
   bool _isLoading = true;
+  StreamSubscription? _messageSubscription;
 
   @override
   void initState() {
@@ -31,34 +32,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     
     final socketService = ref.read(socketServiceProvider);
     socketService.joinJobRoom(widget.job.id);
-    socketService.listenForMessages((data) {
-       final message = Message.fromJson(data);
-       if (mounted) {
-        setState(() {
-          _messages.add(message);
-        });
-        _scrollToBottom();
+
+    _messageSubscription = socketService.messageStream.listen((data) {
+      if (data['jobId'] == widget.job.id) {
+        final message = Message.fromJson(data);
+        if (mounted) {
+          setState(() {
+            _messages.add(message);
+          });
+        }
       }
     });
   }
 
   @override
   void dispose() {
+    _messageSubscription?.cancel();
     _messageController.dispose();
-    _scrollController.dispose();
     super.dispose();
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
   }
 
   Future<void> _fetchMessages() async {
@@ -69,7 +60,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           _messages = messages;
           _isLoading = false;
         });
-        _scrollToBottom();
       }
     } catch (e) {
       log('Error fetching messages: $e');
@@ -87,6 +77,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final user = ref.read(userProvider).value;
     if (user == null) return;
 
+    // Use robust receiver ID logic from original customer chat screen
     final receiverId = user.id == widget.job.clientId?.id
         ? widget.job.providerId?.id
         : widget.job.clientId?.id;
@@ -113,6 +104,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final currentUser = ref.watch(userProvider).value;
     final theme = Theme.of(context);
     
+    // Use robust title logic from original customer chat screen
     final otherUser = currentUser?.id == widget.job.clientId?.id
         ? widget.job.providerId
         : widget.job.clientId;
@@ -122,10 +114,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(chatTitle),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.call_outlined)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
-        ],
+        // Provider-specific Accept/Decline actions are removed
       ),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
@@ -133,8 +122,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16),
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
                   final message = _messages[index];
@@ -150,6 +137,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 }
 
+// Synced with Provider's version for UI consistency
 class _MessageBubble extends StatelessWidget {
   final bool isMe;
   final String text;
@@ -161,29 +149,22 @@ class _MessageBubble extends StatelessWidget {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: isMe ? theme.colorScheme.primary : theme.colorScheme.surface,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(0),
-            bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(16),
-          )
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           text,
-          style: TextStyle(
-            color: isMe ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-            fontSize: 15,
-          ),
+          style: TextStyle(color: isMe ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface),
         ),
       ),
     );
   }
 }
 
+// Synced with Provider's version for UI consistency
 class _MessageInputField extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSend;
@@ -192,12 +173,12 @@ class _MessageInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          border: Border(top: BorderSide(color: theme.colorScheme.tertiary.withOpacity(0.5)))
+        color: theme.colorScheme.surface,
+        border: Border(top: BorderSide(color: theme.colorScheme.tertiary.withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -206,33 +187,14 @@ class _MessageInputField extends StatelessWidget {
               controller: controller,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.typeMessage,
-                fillColor: theme.scaffoldBackgroundColor,
-                filled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: theme.colorScheme.primary),
-                ),
               ),
               onSubmitted: (_) => onSend(),
             ),
           ),
-          const SizedBox(width: 12),
           IconButton(
-            style: IconButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              padding: const EdgeInsets.all(12),
-            ),
             icon: const Icon(Icons.send),
             onPressed: onSend,
+            color: theme.colorScheme.primary,
           ),
         ],
       ),
