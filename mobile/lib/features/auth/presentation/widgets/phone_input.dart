@@ -59,7 +59,7 @@ class PhoneInput extends StatelessWidget {
                 ],
               ),
             ),
-            hintText: '91 234 5678',
+            hintText: l10n.phoneHint,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

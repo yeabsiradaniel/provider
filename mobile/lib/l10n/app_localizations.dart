@@ -1249,6 +1249,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SEND OTP'**
   String get sendOtp;
+
+  /// No description provided for @setYourStandardRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your standard rate'**
+  String get setYourStandardRate;
+
+  /// No description provided for @priceHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'This price will be applied to all your selected services. You can change individual prices later.'**
+  String get priceHelperText;
+
+  /// No description provided for @priceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'0'**
+  String get priceHint;
+
+  /// No description provided for @currencyPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'ETB '**
+  String get currencyPrefix;
+
+  /// No description provided for @pleaseEnterPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a price'**
+  String get pleaseEnterPrice;
+
+  /// No description provided for @amountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'0.00'**
+  String get amountHint;
+
+  /// No description provided for @otpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'------'**
+  String get otpHint;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'91 234 5678'**
+  String get phoneHint;
 }
 
 class _AppLocalizationsDelegate

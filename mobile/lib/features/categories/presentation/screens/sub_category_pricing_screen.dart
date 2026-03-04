@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/features/auth/presentation/screens/auth_check_screen.dart';
 import 'package:mobile/features/categories/domain/models/category.dart';
@@ -11,50 +12,48 @@ class SubCategoryPricingScreen extends ConsumerStatefulWidget {
 
   const SubCategoryPricingScreen({Key? key, required this.categories})
       : super(key: key);
-      
-        @override
+
+  @override
   _SubCategoryPricingScreenState createState() =>
       _SubCategoryPricingScreenState();
 }
 
 class _SubCategoryPricingScreenState
     extends ConsumerState<SubCategoryPricingScreen> {
-  final Map<String, TextEditingController> _priceControllers = {};
+  final TextEditingController _priceController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
   final ProviderService _providerService = ProviderService();
 
   @override
-  void initState() {
-    super.initState();
-    for (var category in widget.categories) {
-      _priceControllers[category.id] = TextEditingController();
-    }
-  }
-
-  @override
   void dispose() {
-    for (var controller in _priceControllers.values) {
-      controller.dispose();
-    }
+    _priceController.dispose();
     super.dispose();
   }
 
   Future<void> _savePrices() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     setState(() {
       _isSaving = true;
     });
 
     try {
-      final List<Map<String, dynamic>> services = [];
-      for (var category in widget.categories) {
-        final price = int.tryParse(_priceControllers[category.id]!.text);
-        if (price != null) {
-          services.add({
-            'category': category.id,
-            'price': price,
-          });
-        }
+      final price = int.tryParse(_priceController.text);
+      if (price == null) {
+        // This case should be caught by the validator, but as a safeguard:
+        setState(() => _isSaving = false);
+        return;
       }
+
+      final List<Map<String, dynamic>> services = widget.categories.map((category) {
+        return {
+          'category': category.id,
+          'price': price,
+        };
+      }).toList();
 
       await _providerService.updateServices(services);
 
@@ -84,36 +83,64 @@ class _SubCategoryPricingScreenState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.setYourPrices),
       ),
-      body: ListView.builder(
-        itemCount: widget.categories.length,
-        itemBuilder: (context, index) {
-          final category = widget.categories[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
-                  child: Text(category.name['en'] ?? 'No name'),
+                Text(
+                  l10n.setYourStandardRate,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
-                  width: 100,
-                  child: TextField(
-                    controller: _priceControllers[category.id],
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: l10n.price,
-                      border: const OutlineInputBorder(),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.priceHelperText,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.secondary),
+                ),
+                const SizedBox(height: 48),
+                TextFormField(
+                  controller: _priceController,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    hintText: l10n.priceHint,
+                    hintStyle: theme.textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.secondary.withOpacity(0.3),
+                    ),
+                    border: InputBorder.none,
+                    prefixText: l10n.currencyPrefix,
+                    prefixStyle: theme.textTheme.headlineSmall?.copyWith(
+                      color: theme.colorScheme.secondary,
                     ),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.pleaseEnterPrice;
+                    }
+                    if (int.tryParse(value) == null) {
+                      return l10n.pleaseEnterValidNumber;
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),
-          );
-        },
+          ),
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),

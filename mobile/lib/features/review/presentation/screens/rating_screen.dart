@@ -138,8 +138,7 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
                 ],
                 decoration: InputDecoration(
-                  hintText: '0.00',
-                  prefixText: 'ETB ',
+                  hintText: l10n.amountHint,                  prefixText: 'ETB ',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {

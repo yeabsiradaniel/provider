@@ -205,5 +205,14 @@
   "noEarningsData": "ለዚህ ወር ምንም የገቢ ውሂብ የለም።",
   "youHaveNoActiveChats": "ምንም ንቁ ውይይቶች የሉዎትም።",
   "enterYourPhoneNumberToReset": "ፒንዎን እንደገና ለማስጀመር ስልክ ቁጥርዎን ያስገቡ",
-  "sendOtp": "ኦቲፒ ላክ"
+  "sendOtp": "ኦቲፒ ላክ",
+  "setYourStandardRate": "መደበኛ ክፍያዎን ይወስኑ",
+  "priceHelperText": "ይህ ዋጋ ለሁሉም ለመረጧቸው አገልግሎቶች ተፈጻሚ ይሆናል። በኋላ ላይ የእያንዳንዱን አገልግሎት ዋጋ መቀየር ይችላሉ።",
+  "priceHint": "0",
+  "currencyPrefix": "ETB ",
+  "pleaseEnterPrice": "እባክዎን ዋጋ ያስገቡ",
+  "pleaseEnterValidNumber": "እባክዎን ትክክለኛ ቁጥር ያስገቡ።",
+  "amountHint": "0.00",
+  "otpHint": "------",
+  "phoneHint": "91 234 5678"
 }

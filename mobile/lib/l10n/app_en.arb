@@ -205,5 +205,14 @@
   "noEarningsData": "No earnings data available for this month.",
   "youHaveNoActiveChats": "You have no active chats.",
   "enterYourPhoneNumberToReset": "Enter your phone number to reset your PIN",
-  "sendOtp": "SEND OTP"
+  "sendOtp": "SEND OTP",
+  "setYourStandardRate": "Set your standard rate",
+  "priceHelperText": "This price will be applied to all your selected services. You can change individual prices later.",
+  "priceHint": "0",
+  "currencyPrefix": "ETB ",
+  "pleaseEnterPrice": "Please enter a price",
+  "pleaseEnterValidNumber": "Please enter a valid number",
+  "amountHint": "0.00",
+  "otpHint": "------",
+  "phoneHint": "91 234 5678"
 }

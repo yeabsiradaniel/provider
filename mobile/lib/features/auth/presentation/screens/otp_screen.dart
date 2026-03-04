@@ -173,8 +173,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     controller: _otpController,
                     isNumeric: true,
                     maxLength: 6,
-                    hintText: 'Enter 6-digit OTP',
-                    customValidator: (value) {
+                    hintText: l10n.enter6DigitCode,                    customValidator: (value) {
                       if (value == null || value.isEmpty) {
                         return l10n.fieldRequired;
                       }

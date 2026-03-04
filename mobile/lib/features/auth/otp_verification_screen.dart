@@ -55,7 +55,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                 decoration: const InputDecoration(
                   counterText: "",
                   border: OutlineInputBorder(),
-                  hintText: '------',
+                  hintText: l10n.otpHint,
                 ),
               ),
               const SizedBox(height: 32),

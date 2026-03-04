@@ -605,4 +605,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sendOtp => 'SEND OTP';
+
+  @override
+  String get setYourStandardRate => 'Set your standard rate';
+
+  @override
+  String get priceHelperText =>
+      'This price will be applied to all your selected services. You can change individual prices later.';
+
+  @override
+  String get priceHint => '0';
+
+  @override
+  String get currencyPrefix => 'ETB ';
+
+  @override
+  String get pleaseEnterPrice => 'Please enter a price';
+
+  @override
+  String get amountHint => '0.00';
+
+  @override
+  String get otpHint => '------';
+
+  @override
+  String get phoneHint => '91 234 5678';
 }

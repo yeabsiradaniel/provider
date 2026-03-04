@@ -401,7 +401,7 @@ class AppLocalizationsAm extends AppLocalizations {
   String get pleaseEnterAmount => 'እባክዎ መጠን ያስገቡ';
 
   @override
-  String get pleaseEnterValidNumber => 'እባክዎ ትክክለኛ ቁጥር ያስገቡ';
+  String get pleaseEnterValidNumber => 'እባክዎን ትክክለኛ ቁጥር ያስገቡ።';
 
   @override
   String get submitPaymentAndReview => 'ክፍያ እና ግምገማ ያስገቡ';
@@ -598,4 +598,29 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get sendOtp => 'ኦቲፒ ላክ';
+
+  @override
+  String get setYourStandardRate => 'መደበኛ ክፍያዎን ይወስኑ';
+
+  @override
+  String get priceHelperText =>
+      'ይህ ዋጋ ለሁሉም ለመረጧቸው አገልግሎቶች ተፈጻሚ ይሆናል። በኋላ ላይ የእያንዳንዱን አገልግሎት ዋጋ መቀየር ይችላሉ።';
+
+  @override
+  String get priceHint => '0';
+
+  @override
+  String get currencyPrefix => 'ETB ';
+
+  @override
+  String get pleaseEnterPrice => 'እባክዎን ዋጋ ያስገቡ';
+
+  @override
+  String get amountHint => '0.00';
+
+  @override
+  String get otpHint => '------';
+
+  @override
+  String get phoneHint => '91 234 5678';
 }
