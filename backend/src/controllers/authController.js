@@ -8,8 +8,9 @@ const requestOtp = async (req, res) => {
     }
 
     try {
-        await authService.requestOtp(phoneNumber);
-        res.status(200).json({ message: 'OTP sent.' });
+        const otp = await authService.requestOtp(phoneNumber); // Capture the returned OTP
+        // FOR TESTING ONLY: Send the OTP in the response. REMOVE FOR PRODUCTION.
+        res.status(200).json({ message: 'OTP sent.', otpForTesting: otp });
     } catch (error) {
         console.error('Request OTP Error:', error);
         res.status(500).json({ message: 'Error requesting OTP.', error: error.message });

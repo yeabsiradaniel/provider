@@ -12,6 +12,8 @@ const requestOtp = async (phoneNumber) => {
         { otp, attempts: 0 },
         { upsert: true, new: true, setDefaultsOnInsert: true }
     );
+
+    return otp; // Return the OTP for testing
 };
 
 const verifyOtp = async (phoneNumber, otp, userData) => {
